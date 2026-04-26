@@ -4,7 +4,7 @@
 <div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh;">
     <div class="container">
         
-        {{-- 1. Notifikasi Sukses --}}
+        {{-- 1. Notifikasi Flash --}}
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -12,6 +12,7 @@
             </div>
         @endif
 
+        {{-- 2. Alert Verifikasi Ditolak --}}
         @if($user->verification && $user->verification->status == 'rejected')
             <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 p-4" role="alert">
                 <div class="d-flex align-items-center">
@@ -28,6 +29,7 @@
             </div>
         @endif
 
+        {{-- 3. Card Profil Utama --}}
         <div class="card border-0 shadow-sm rounded-4 p-4 mb-5" style="background: white;">
             <div class="row align-items-center">
                 <div class="col-md-3 text-center">
@@ -59,11 +61,11 @@
                     </p>
 
                     <div class="d-flex gap-3 flex-wrap">
-                        {{-- Logika Tombol Berdasarkan Status Verifikasi --}}
+                        {{-- Logika Tombol --}}
                         @if($user->isVerified())
-                            <a href="#" class="btn text-white px-4 rounded-pill shadow-sm py-2" style="background-color: #8b6262;">
+                            <button class="btn text-white px-4 rounded-pill shadow-sm py-2" style="background-color: #8b6262;" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 <i class="bi bi-plus-lg me-2"></i> Tambah Item Barter
-                            </a>
+                            </button>
                         @elseif($user->verification && $user->verification->status == 'pending')
                             <button class="btn btn-warning text-dark px-4 rounded-pill shadow-sm py-2" disabled style="cursor: not-allowed; opacity: 0.8;">
                                 <i class="bi bi-clock-history me-2"></i> KTP Sedang Dicek Admin
@@ -78,6 +80,7 @@
             </div>
         </div>
 
+        {{-- 4. Judul Lemari Virtual --}}
         <div class="row mb-4">
             <div class="col">
                 <div class="d-flex align-items-center gap-3">
@@ -90,6 +93,7 @@
             </div>
         </div>
 
+        {{-- 5. Grid Produk Lemari Virtual --}}
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
             @forelse($userProducts as $item)
                 <div class="col">
@@ -117,16 +121,6 @@
                     <div class="py-5 bg-white rounded-4 shadow-sm border border-dashed mx-auto" style="max-width: 500px;">
                         <i class="bi bi-archive text-muted" style="font-size: 3.5rem; opacity: 0.2;"></i>
                         <p class="mt-3 text-muted fw-light px-3">Lemari virtual kamu masih kosong. Mulai upload barang barter kamu!</p>
-                        @if(!$user->isVerified())
-                            <p class="small text-danger mb-0">
-                                <i class="bi bi-info-circle"></i> 
-                                @if($user->verification && $user->verification->status == 'pending')
-                                    Tunggu verifikasi admin untuk upload ya.
-                                @else
-                                    Verifikasi KTP dulu ya untuk upload barang.
-                                @endif
-                            </p>
-                        @endif
                     </div>
                 </div>
             @endforelse
@@ -134,14 +128,15 @@
     </div>
 </div>
 
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+{{-- MODAL 1: EDIT PROFIL --}}
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <form action="{{ route('profile.update-full') }}" method="POST">
                 @csrf
                 @method('PATCH')
                 <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" id="editProfileModalLabel" style="font-family: 'Playfair Display'; color: #8b6262;">
+                    <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display'; color: #8b6262;">
                         <i class="bi bi-person-lines-fill me-2"></i> Edit Profil
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -154,35 +149,68 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-uppercase text-muted">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">@</span>
-                                <input type="text" name="username" class="form-control rounded-3 border-start-0" value="{{ $user->username }}" required>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-uppercase text-muted">Email Address</label>
-                            <input type="email" name="email" class="form-control rounded-3" value="{{ $user->email }}" required>
+                            <input type="text" name="username" class="form-control rounded-3" value="{{ $user->username }}" required>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-uppercase text-muted">Bio</label>
-                            <textarea name="bio" class="form-control rounded-3" rows="3" maxlength="160" placeholder="Ceritakan personal style kamu...">{{ $user->bio }}</textarea>
-                            <div class="form-text text-end small">Maksimal 160 karakter.</div>
-                        </div>
-                        
-                        <div class="col-md-12">
-                            <div class="p-3 rounded-3 bg-light mt-2">
-                                <label class="form-label small fw-bold text-uppercase text-muted"><i class="bi bi-key me-1"></i> Keamanan</label>
-                                <input type="password" name="password" class="form-control rounded-3 mb-2" placeholder="Password Baru">
-                                <small class="text-muted d-block">Biarkan kosong jika tidak ingin mengubah password.</small>
-                            </div>
+                            <textarea name="bio" class="form-control rounded-3" rows="3" maxlength="160">{{ $user->bio }}</textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
                     <button type="button" class="btn btn-light px-4 rounded-pill" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn text-white px-5 rounded-pill shadow-sm" style="background-color: #8b6262;">
-                        Simpan Perubahan
-                    </button>
+                    <button type="submit" class="btn text-white px-5 rounded-pill shadow-sm" style="background-color: #8b6262;">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL 2: TAMBAH ITEM BARTER --}}
+<div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <form action="{{ route('barter.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header border-0 p-4 bg-light">
+                    <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display'; color: #8b6262;">Isi Lemari Virtual</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted text-uppercase">Nama Barang</label>
+                        <input type="text" name="nama_barang" class="form-control rounded-3" placeholder="Contoh: Blouse Zara Motif Bunga" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase">Kategori</label>
+                            <select name="kategori" class="form-select rounded-3" required>
+                                <option value="Atasan">Atasan</option>
+                                <option value="Bawahan">Bawahan</option>
+                                <option value="Dress">Dress</option>
+                                <option value="Aksesoris">Aksesoris</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold text-muted text-uppercase">Kondisi</label>
+                            <select name="kondisi" class="form-select rounded-3" required>
+                                <option value="Like New">Like New (99%)</option>
+                                <option value="Good Condition">Good Condition</option>
+                                <option value="Well Used">Well Used</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted text-uppercase">Deskripsi & Minus</label>
+                        <textarea name="deskripsi" class="form-control rounded-3" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-0">
+                        <label class="small fw-bold text-muted text-uppercase">Foto Barang</label>
+                        <input type="file" name="foto_barang" class="form-control rounded-3" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="submit" class="btn text-white w-100 rounded-pill py-2 shadow-sm" style="background-color: #8b6262;">Simpan ke Lemari</button>
                 </div>
             </form>
         </div>
@@ -190,13 +218,10 @@
 </div>
 
 <style>
-    @media (min-width: 768px) {
-        .border-start-md { border-left: 1px solid #eee !important; }
-    }
+    @media (min-width: 768px) { .border-start-md { border-left: 1px solid #eee !important; } }
     .text-maroon { color: #8b6262; }
     .product-card { transition: all 0.3s ease; }
     .product-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
     .border-dashed { border: 2px dashed #e9ecef !important; }
-    .btn-outline-secondary:hover { background-color: #8b6262; border-color: #8b6262; color: white; }
 </style>
 @endsection

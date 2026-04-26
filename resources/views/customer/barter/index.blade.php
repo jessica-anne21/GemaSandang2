@@ -1,69 +1,68 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-    
-    <div style="width: 100%; max-width: 1100px; text-align: center;">
+<div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+    <div class="container">
         
         {{-- HEADER --}}
-        <header style="margin-bottom: 50px;">
-            <h1 style="font-family: 'Playfair Display', serif; font-weight: 800; color: #8b6262; font-size: 3.5rem; margin-bottom: 10px;">
-                Barter Area
-            </h1>
-            <p style="color: #6c757d; font-size: 1.2rem;">Atur barter bajumu dan temukan gaya baru dari lemari teman</p>
-        </header>
+        <div class="text-center mb-5">
+            <h1 style="font-family: 'Playfair Display', serif; color: #8b6262; font-weight: 800; font-size: 3rem;">Barter Area</h1>
+            <p class="text-muted">Tukar koleksimu dengan gaya baru dari lemari user lain.</p>
+            <hr style="width: 100px; border: 2px solid #8b6262; opacity: 1; margin: 20px auto;">
+        </div>
 
-        @if(!$user->isVerified())
-            {{-- BOX TERKUNCI --}}
-            <div style="padding: 40px 0; animation: fadeIn 1s;">
-                <div style="width: 110px; height: 110px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; box-shadow: 0 15px 35px rgba(139, 98, 98, 0.15);">
-                    <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #8b6262;"></i>
-                </div>
-                
-                <h2 style="font-family: 'Playfair Display', serif; font-weight: 700; color: #8b6262; margin-bottom: 15px;">Akses Terkunci!</h2>
-                
-                <div style="max-width: 500px; margin: 0 auto;">
-                    @if($user->verification && $user->verification->status == 'pending')
-                        <p style="color: #6c757d; margin-bottom: 30px;">Sabar ya! KTP kamu lagi dicek sama admin Gema Sandang. ✨</p>
-                        {{-- BUTTON PENDING --}}
-                        <div style="display: inline-block; background: #fdf5f5; color: #8b6262; border: 2px solid #8b6262; border-radius: 50px; padding: 14px 40px; font-weight: 700; letter-spacing: 1px;">
-                            <i class="bi bi-hourglass-split"></i> DATA SEDANG DIPROSES
+        {{-- GRID BARANG BARTER --}}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @forelse($barterItems as $item)
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card bg-white">
+                        <div class="position-relative">
+                            {{-- Foto Barang --}}
+                            <img src="{{ asset('storage/' . $item->foto_barang) }}" class="card-img-top" style="height: 250px; object-fit: cover;">
+                            
+                            {{-- Badge Kategori --}}
+                            <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-white text-dark shadow-sm px-3 py-2" style="font-size: 0.7rem; opacity: 0.9;">
+                                {{ $item->kategori }}
+                            </span>
                         </div>
-                    @else
-                        <p style="color: #6c757d; margin-bottom: 30px;">Verifikasi KTP dulu yuk biar bisa barteran sama temen-temen lainnya!</p>
-                        
-                        <a href="{{ route('verification.form') }}" 
-                           style="display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #8b6262 0%, #6d4b4b 100%); color: #ffffff !important; border-radius: 50px; padding: 18px 45px; font-weight: 700; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; text-decoration: none !important; border: none; box-shadow: 0 10px 25px rgba(139, 98, 98, 0.3); transition: 0.3s;">
-                            <i class="bi bi-shield-check" style="font-size: 1.2rem;"></i> 
-                            VERIFIKASI SEKARANG
-                        </a>
-                    @endif
-                </div>
-            </div>
-        @else
-            {{-- GRID PRODUK (SUDAH VERIF) --}}
-            <div class="row row-cols-1 row-cols-md-3 g-4" style="text-align: left;">
-                @forelse($barterItems as $item)
-                    <div class="col">
-                        <div style="background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.04); height: 100%;">
-                            <div style="height: 250px; background: #eee;">
-                                <img src="{{ asset('storage/' . $item->foto_barang) }}" style="width: 100%; height: 100%; object-fit: cover;">
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            {{-- Info Pemilik --}}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center text-white fw-bold" 
+                                     style="width: 30px; height: 30px; background-color: #8b6262; font-size: 0.7rem;">
+                                    {{ strtoupper(substr($item->user->name, 0, 1)) }}
+                                </div>
+                                <a href="{{ url('/profile/' . $item->user->id) }}" class="small text-decoration-none fw-bold text-dark">
+                                    {{ $item->user->name }} 
+                                    <i class="bi bi-patch-check-fill text-primary ms-1" style="font-size: 0.8rem;"></i>
+                                </a>
                             </div>
-                            <div style="padding: 25px;">
-                                <h6 style="font-weight: 800; margin-bottom: 5px;">{{ $item->nama_barang }}</h6>
-                                <p style="font-size: 0.85rem; color: #8b6262; font-weight: 700;">Owner: @<span>{{ $item->user->username }}</span></p>
-                                <a href="#" style="display: block; width: 100%; background: #8b6262; color: white; text-align: center; padding: 10px; border-radius: 50px; text-decoration: none; font-weight: 600; margin-top: 15px;">Ajukan Barter</a>
+
+                            <h5 class="fw-bold mb-2" style="color: #444;">{{ $item->nama_barang }}</h5>
+                            <p class="text-muted small mb-4 flex-grow-1">
+                                {{ Str::limit($item->deskripsi, 60) }}
+                            </p>
+
+                            <div class="mt-auto d-grid">
+                                <a href="{{ route('barter.show', $item->id) }}" class="btn text-white rounded-pill py-2 fw-bold" style="background-color: #8b6262;">
+                                    Ajukan Barter
+                                </a>
                             </div>
                         </div>
                     </div>
-                @empty
-                    <div style="width: 100%; text-align: center; padding: 50px;">
-                        <p class="text-muted">Belum ada barang barter nih.</p>
-                    </div>
-                @endforelse
-            </div>
-        @endif
+                </div>
+            @empty
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mt-3 italic">Belum ada barang yang tersedia untuk dibarter nih, Sis.</p>
+                </div>
+            @endforelse
+        </div>
 
+        {{-- PAGINATION --}}
+        <div class="d-flex justify-content-center mt-5">
+            {{ $barterItems->links() }}
+        </div>
     </div>
 </div>
 @endsection

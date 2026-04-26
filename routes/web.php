@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\TrendController as AdminTrendController;
 use App\Http\Controllers\Admin\AdminBargainController;
 use App\Http\Controllers\Admin\VerificationController;
+use App\Http\Controllers\Customer\BarterItemController;
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'create'])->middleware('guest')->name('login');
@@ -91,14 +93,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/barter-area', [BarterController::class, 'index'])->name('barter.index');
     Route::post('/barter-area/store', [BarterController::class, 'store'])->name('barter.store');
+    Route::get('/barter/{id}', [BarterController::class, 'show'])->name('barter.show');
+    Route::post('/barter/request/{id}', [BarterController::class, 'sendRequest'])->name('barter.request.send'); 
 
-    Route::get('/my-profile', [ProfileController::class, 'edit'])->name('profile.my-profile');
+    Route::get('/my-profile', [ProfileController::class, 'index'])->name('profile.my-profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/update-full', [ProfileController::class, 'updateFull'])->name('profile.update-full');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/verify-identity', [ProfileController::class, 'showVerificationForm'])->name('verification.form');
     Route::post('/verify-identity', [ProfileController::class, 'submitVerification'])->name('verification.submit');
     Route::get('/profile/{id}', [ProfileController::class, 'showPublicProfile'])->name('profile.public');
+    Route::post('/my-closet/add', [BarterItemController::class, 'store'])->name('barter.store');
 });
 
 require __DIR__.'/auth.php';

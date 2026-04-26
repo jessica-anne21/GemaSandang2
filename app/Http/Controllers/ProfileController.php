@@ -32,7 +32,7 @@ public function showPublicProfile($id)
     ]);
 }
 
-public function edit(Request $request): View
+public function index(Request $request): View
 {
     $user = $request->user();
     
