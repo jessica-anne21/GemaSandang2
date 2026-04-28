@@ -196,6 +196,12 @@
                         @endif
                     </a>
                 </li>
+
+                <li>
+    <a class="dropdown-item" href="{{ route('barter.inbox') }}">
+        <i class="bi bi-arrow-left-right me-2"></i> Riwayat Barter
+    </a>
+</li>
                 
                 <li><hr class="dropdown-divider opacity-50"></li>
                 

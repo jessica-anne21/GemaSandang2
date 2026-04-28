@@ -95,6 +95,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/barter-area/store', [BarterController::class, 'store'])->name('barter.store');
     Route::get('/barter/{id}', [BarterController::class, 'show'])->name('barter.show');
     Route::post('/barter/request/{id}', [BarterController::class, 'sendRequest'])->name('barter.request.send'); 
+    Route::get('/riwayat-barter', [BarterController::class, 'inbox'])->name('barter.inbox');
+    Route::post('/barter/update-status/{id}', [BarterController::class, 'updateStatus'])->name('barter.update-status');
+    Route::post('/barter/update-resi/{id}', [BarterController::class, 'updateResi'])->name('barter.update-resi');
+    Route::post('/barter/confirm-arrival/{id}', [BarterController::class, 'confirmArrival'])->name('barter.confirm-arrival');
+    Route::delete('/barter/item/{id}', [BarterController::class, 'destroy'])->name('barter.destroy');
+    Route::patch('/barter/item/{id}', [BarterController::class, 'update'])->name('barter.update');
+    Route::post('/barter/send-otp/{id?}', [BarterController::class, 'sendOtp'])->name('barter.send-otp');
+    Route::post('/barter/verify-otp/{id}', [BarterController::class, 'verifyAcceptance'])->name('barter.verify-otp');
 
     Route::get('/my-profile', [ProfileController::class, 'index'])->name('profile.my-profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

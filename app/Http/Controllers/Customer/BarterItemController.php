@@ -39,7 +39,7 @@ class BarterItemController extends Controller
             'status'      => 'available'
         ]);
 
-        return back()->with('success', 'Barang berhasil masuk lemari virtual kamu! ✨');
+        return back()->with('success', 'Barang berhasil masuk lemari virtual kamu!');
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         // Kalau error gara-gara input nggak sesuai validasi

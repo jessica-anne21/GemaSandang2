@@ -8,7 +8,7 @@
             {{-- Navigasi Back --}}
             <div class="mb-4">
                 <a href="{{ route('barter.index') }}" class="text-decoration-none text-muted fw-bold">
-                    <i class="bi bi-arrow-left me-2"></i> Kembali ke Barter Area
+                    <i class="bi bi-arrow-left me-2"></i> Kembali 
                 </a>
             </div>
 
@@ -29,7 +29,7 @@
                     {{-- Detail Produk --}}
                     <div class="col-md-6 bg-white p-4 p-lg-5">
                         <div class="d-flex justify-content-between align-items-start mb-3">
-                            <span class="badge rounded-pill px-3 py-2" style="background-color: #fceaea; color: #8b6262;">
+                            <span class="badge rounded-pill px-3 py-2" style="background-color: #fff0f0; color: #800000; border: 1px solid #ffcccc;">
                                 {{ $item->kategori }}
                             </span>
                             <span class="text-muted small">Kondisi: <strong class="text-dark">{{ $item->kondisi }}</strong></span>
@@ -42,7 +42,7 @@
                         {{-- Card Pemilik --}}
                         <div class="d-flex align-items-center mb-4 p-3 rounded-4" style="background-color: #fef9f9; border: 1px solid #fceaea;">
                             <div class="rounded-circle me-3 d-flex align-items-center justify-content-center text-white fw-bold" 
-                                 style="width: 50px; height: 50px; background-color: #8b6262; font-size: 1.1rem;">
+                                 style="width: 50px; height: 50px; background-color: #800000; font-size: 1.1rem;">
                                 {{ strtoupper(substr($item->user->name, 0, 1)) }}
                             </div>
                             <div>
@@ -60,18 +60,62 @@
                             </p>
                         </div>
 
-                        {{-- Tombol Aksi --}}
+                        {{-- TOMBOL AKSI BERDASARKAN STATUS --}}
                         <div class="d-grid gap-3">
+                            @php
+                                // Ambil data request barter terakhir untuk barang ini dari user yang sedang login
+                                $barterRequest = \App\Models\BarterRequest::where('requested_item_id', $item->id)
+                                                ->where('sender_id', auth()->id())
+                                                ->first();
+                            @endphp
+
                             @if($userProducts->isEmpty())
                                 <div class="alert alert-warning rounded-4 small border-0 shadow-sm">
-                                    <i class="bi bi-info-circle me-2"></i> Kamu belum punya barang di lemari virtual untuk dibarter. 
+                                    <i class="bi bi-info-circle me-2"></i> Kamu belum punya barang untuk dibarter. 
                                     <a href="{{ route('profile.my-profile') }}" class="fw-bold text-dark">Upload dulu yuk!</a>
                                 </div>
+                            
+                            @elseif($barterRequest && $barterRequest->status == 'accepted')
+                                {{-- KONDISI 1: SUDAH DEAL / ACCEPTED --}}
+                                <div class="alert alert-success rounded-4 border-0 shadow-sm p-3 mb-2 d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Barter Disetujui!</h6>
+                                        <small>Silakan lanjut berdiskusi melalui fitur chat.</small>
+                                    </div>
+                                </div>
+                                <a href="{{ route('chat.show', $barterRequest->id) }}" class="btn text-white rounded-pill py-3 fw-bold shadow-sm" 
+                                   style="background-color: #800000; font-size: 1.1rem;">
+                                    <i class="bi bi-chat-dots-fill me-2"></i> Lanjut ke Chat Negosiasi
+                                </a>
+
+                            @elseif($barterRequest && $barterRequest->status == 'pending')
+                                {{-- KONDISI 2: SUDAH NAWAR TAPI MASIH PENDING --}}
+                                <button class="btn btn-secondary w-100 rounded-pill py-3 fw-bold shadow-sm" disabled style="cursor: not-allowed;">
+                                    <i class="bi bi-clock-history me-2"></i> Penawaran Sedang Diproses...
+                                </button>
+                                <div class="p-3 rounded-4 mt-2 text-center" style="background-color: #f8f9fa; border: 1px dashed #dee2e6;">
+                                    <p class="mb-0 small text-muted">
+                                        Kamu sudah mengajukan barter. Tunggu pemilik barang menyetujui ya!
+                                    </p>
+                                </div>
+
+                            @elseif($barterRequest && $barterRequest->status == 'rejected')
+                                {{-- KONDISI 3: DITOLAK --}}
+                                <div class="alert alert-danger rounded-4 border-0 shadow-sm text-center">
+                                    <i class="bi bi-x-circle-fill me-2"></i> Penawaran kamu sebelumnya ditolak oleh pemilik barang.
+                                </div>
+                                <button type="button" class="btn text-white rounded-pill py-3 fw-bold shadow-sm" 
+                                        style="background-color: #800000;" data-bs-toggle="modal" data-bs-target="#offerBarterModal">
+                                    Coba Ajukan Barang Lain
+                                </button>
+
                             @else
+                                {{-- KONDISI 4: BELUM NAWAR SAMA SEKALI --}}
                                 <button type="button" class="btn text-white rounded-pill py-3 fw-bold shadow-sm btn-hover-effect" 
-                                        style="background-color: #8b6262; border: none; font-size: 1.1rem;"
+                                        style="background-color: #800000; font-size: 1.1rem;"
                                         data-bs-toggle="modal" data-bs-target="#offerBarterModal">
-                                    <i class="bi bi-arrow-left-right me-2"></i>Ajukan Penawaran Barter
+                                    <i class="bi bi-arrow-left-right me-2"></i> Ajukan Penawaran Barter
                                 </button>
                             @endif
                         </div>
@@ -83,7 +127,7 @@
     </div>
 </div>
 
-{{-- MODAL PILIH BARANG (ISIAN LEMARI USER) --}}
+{{-- MODAL PILIH BARANG (Tetap diperlukan untuk kondisi belum nambah atau ditolak) --}}
 @if(!$userProducts->isEmpty())
 <div class="modal fade" id="offerBarterModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -91,7 +135,7 @@
             <form action="{{ route('barter.request.send', $item->id) }}" method="POST">
                 @csrf
                 <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display'; color: #8b6262;">Pilih Barang Penukar</h5>
+                    <h5 class="modal-title fw-bold" style="color: #800000; font-family: 'Playfair Display';">Pilih Barang Penukar</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -113,12 +157,12 @@
                     </div>
 
                     <div class="mt-4">
-                        <label class="small fw-bold text-muted text-uppercase mb-2">Pesan Negosiasi</label>
-                        <textarea name="pesan" class="form-control rounded-3" rows="2" placeholder="Halo kak, barter sama punyaku yang ini yuk? Kondisinya masih Like New loh!"></textarea>
+                        <label class="small fw-bold text-muted text-uppercase mb-2">Pesan Negosiasi (Opsional)</label>
+                        <textarea name="pesan" class="form-control rounded-3" rows="2" placeholder="Halo kak, mari barter!"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn text-white w-100 rounded-pill py-3 fw-bold shadow-sm btn-hover-effect" style="background-color: #8b6262;">
+                    <button type="submit" class="btn text-white w-100 rounded-pill py-3 fw-bold shadow-sm" style="background-color: #800000;">
                         Kirim Penawaran Sekarang
                     </button>
                 </div>
@@ -129,35 +173,21 @@
 @endif
 
 <style>
-    .btn-hover-effect:hover {
-        background-color: #6d4a4a !important;
-        transform: translateY(-2px);
-        transition: all 0.3s ease;
-    }
-    
-    /* Style Visual Selection */
     .barter-option-card {
         border-color: transparent;
         transition: all 0.3s ease;
     }
 
     .btn-check:checked + .barter-option-card {
-        border-color: #8b6262 !important;
+        border-color: #800000 !important;
         background-color: #fff9f9;
         transform: scale(1.02);
-        box-shadow: 0 10px 20px rgba(139, 98, 98, 0.1) !important;
     }
 
-    /* Custom Scrollbar Modal */
-    ::-webkit-scrollbar {
-        width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #8b6262;
-        border-radius: 10px;
+    .btn-hover-effect:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        transition: 0.3s;
     }
 </style>
 @endsection
