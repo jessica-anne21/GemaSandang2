@@ -66,41 +66,42 @@ class TrendController extends Controller
     }
 
     public function publish(Request $request, $id)
-    {
-        $request->validate([
-            'judul' => 'required',
-            'style' => 'required',
-            'warna' => 'required',
-            'gambar' => 'required', 
-            'link_sumber' => 'nullable|url', 
-        ]);
+{
+    $request->validate([
+        'judul' => 'required',
+        'style' => 'required',
+        'gambar' => 'required',
+    ]);
 
-        $trend = DB::table('trends')->where('id', $id)->first();
+    // 1. Update data di Database
+    DB::table('trends')->where('id', $id)->update([
+        'judul'       => $request->judul,
+        'deskripsi'   => $request->deskripsi, 
+        'style'       => $request->style,
+        'warna'       => $request->warna,
+        'material'    => $request->material, 
+        'gambar'      => $request->gambar,
+        'link_sumber' => $request->link_sumber,
+        'status'      => 'Published',
+        'updated_at'  => now(),
+    ]);
 
-        DB::table('trends')->where('id', $id)->update([
-            'judul'       => $request->judul,
-            'deskripsi'   => $request->deskripsi, 
-            'style'       => $request->style,
-            'warna'       => $request->warna,
-            'material'    => $request->material, 
-            'gambar'      => $request->gambar,   
-            'link_sumber' => $request->link_sumber,
-            'status'      => 'Published',
-            'updated_at'  => now(),
-        ]);
+    // 2. LOGIC NOTIFIKASI: Cek apakah admin centang 'kirim email'
+    if ($request->has('send_email_notif')) {
+        $subscribers = \App\Models\User::where('role', 'customer')->get();
+        $trendData = DB::table('trends')->where('id', $id)->first();
 
-        if ($trend->status !== 'Published') {
-            try {
-                $notification = new NotificationController();
-                $notification->sendEmailBlast($id);
-                return redirect()->route('admin.trends.index')->with('success', 'Tren Berhasil Dipublikasikan & Notifikasi Email Terkirim! 🚀'); 
-            } catch (\Exception $e) {
-                return redirect()->route('admin.trends.index')->with('success', 'Tren Published, tapi email gagal (kemungkinan kuota habis): ' . $e->getMessage());
-            }
+        foreach ($subscribers as $user) {
+            // Panggil Mail kamu di sini
+            Mail::to($user->email)->send(new \App\Mail\TrendNotificationMail($trendData));
         }
-
-        return redirect()->route('admin.trends.index')->with('success', 'Data Tren Berhasil Diperbarui.');
+        $msg = 'Tren berhasil dipublikasikan dan email notifikasi terkirim!';
+    } else {
+        $msg = 'Tren berhasil dipublikasikan (Tanpa Email).';
     }
+
+    return redirect()->route('admin.trends.index')->with('success', $msg);
+}
 
     public function update(Request $request, $id)
     {

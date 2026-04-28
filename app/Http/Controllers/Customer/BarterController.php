@@ -45,26 +45,32 @@ class BarterController extends Controller
     return view('customer.barter.show', compact('item', 'userProducts', 'alreadyRequested'));
 }
     public function sendRequest(Request $request, $id)
-    {
-        $request->validate([
-            'my_item_id' => 'required|exists:barter_items,id',
-            'pesan' => 'nullable|string|max:500'
-        ]);
+{
+    $request->validate([
+        'my_item_id' => 'required|exists:barter_items,id',
+        'pesan' => 'nullable|string|max:500',
+        'otp_input' => 'required' 
+    ]);
 
-        // Cari barang yang mau dibarter buat dapet ID pemiliknya (receiver)
-        $targetItem = BarterItem::findOrFail($id);
-
-        \App\Models\BarterRequest::create([
-            'sender_id' => auth()->id(),
-            'receiver_id' => $targetItem->user_id,
-            'requested_item_id' => $id,
-            'offered_item_id' => $request->my_item_id,
-            'message' => $request->pesan,
-            'status' => 'pending'
-        ]);
-
-        return redirect()->route('barter.index')->with('success', 'Penawaran barter terkirim! Cek statusnya di menu Riwayat Barter ya!');
+    if ($request->otp_input != session('barter_otp')) {
+        return redirect()->back()->with('error', 'Kode OTP salah! Silakan konfirmasi ulang.');
     }
+
+    session()->forget(['barter_otp', 'otp_timestamp']);
+
+    $targetItem = BarterItem::findOrFail($id);
+
+    \App\Models\BarterRequest::create([
+        'sender_id' => auth()->id(),
+        'receiver_id' => $targetItem->user_id,
+        'requested_item_id' => $id,
+        'offered_item_id' => $request->my_item_id,
+        'message' => $request->pesan,
+        'status' => 'pending'
+    ]);
+
+    return redirect()->route('barter.index')->with('success', 'Penawaran barter terkirim! Cek statusnya di menu Riwayat Barter ya!');
+}
 
     public function inbox()
 {
@@ -178,22 +184,21 @@ public function update(Request $request, $id)
 //     return response()->json(['success' => true]);
 // }
 
-public function sendOtp($id) {
+public function sendOtp($id = null) 
+{
     try {
         $otp = rand(100000, 999999);
-        $barter = BarterRequest::findOrFail($id);
-        $barter->update(['otp_code' => $otp]);
+        
+        // Simpan ke Session saja dulu karena data BarterRequest-nya belum dibuat
+        session(['barter_otp' => $otp]);
+        session(['otp_timestamp' => now()]);
 
-        // Coba kirim email
-        Mail::to(auth()->user()->email)->send(new BarterOtpMail($otp, 'Persetujuan'));
+        // Kirim email ke si Penawar (auth user)
+        Mail::to(auth()->user()->email)->send(new BarterOtpMail($otp, 'Pengajuan Barter'));
 
         return response()->json(['success' => true]);
     } catch (\Exception $e) {
-        // Balikin pesan error aslinya biar kita tau
-        return response()->json([
-            'success' => false, 
-            'message' => $e->getMessage()
-        ], 500);
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
 
