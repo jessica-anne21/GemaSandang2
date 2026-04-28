@@ -152,6 +152,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">Tentang</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('contact') }}">Kontak</a>
+                </li>
             </ul>
 
             {{-- ICON KANAN & AUTH --}}
