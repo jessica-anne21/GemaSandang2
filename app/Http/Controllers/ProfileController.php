@@ -48,32 +48,44 @@ public function index(Request $request): View
 }
 
     public function submitVerification(Request $request)
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        $request->validate([
-            'nik' => 'required|digits:16|unique:user_verifications,nik,' . ($user->verification->id ?? 'NULL'),
-            'ktp_image' => 'required|image|max:2048',
-        ]);
+    // 1. Validasi: Tambahkan selfie_image ke dalam list
+    $request->validate([
+        'nik' => 'required|digits:16|unique:user_verifications,nik,' . ($user->verification->id ?? 'NULL'),
+        'ktp_image' => 'required|image|max:2048',
+        'selfie_image' => 'required|image|max:2048', // Tambahkan validasi selfie
+    ]);
 
-        if ($user->verification && $user->verification->ktp_path) {
+    // 2. Hapus file lama jika ada (Biar storage Hostinger kamu nggak penuh)
+    if ($user->verification) {
+        if ($user->verification->ktp_path) {
             Storage::disk('public')->delete($user->verification->ktp_path);
         }
-
-        $path = $request->file('ktp_image')->store('id_cards', 'public');
-
-        \App\Models\UserVerification::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'nik' => $request->nik,
-                'ktp_path' => $path,
-                'status' => 'pending', 
-                'rejection_reason' => null,  
-            ]
-        );
-
-        return redirect()->route('profile.my-profile')->with('success', 'Data berhasil diperbarui! Tunggu admin cek lagi ya.');
+        if ($user->verification->selfie_path) {
+            Storage::disk('public')->delete($user->verification->selfie_path);
+        }
     }
+
+    // 3. Simpan file baru
+    $ktpPath = $request->file('ktp_image')->store('id_cards', 'public');
+    $selfiePath = $request->file('selfie_image')->store('selfies', 'public');
+
+    // 4. Update database
+    \App\Models\UserVerification::updateOrCreate(
+        ['user_id' => $user->id],
+        [
+            'nik' => $request->nik,
+            'ktp_path' => $ktpPath,
+            'selfie_path' => $selfiePath, // Masukkan path selfie ke kolom database
+            'status' => 'pending', 
+            'rejection_reason' => null,  
+        ]
+    );
+
+    return redirect()->route('profile.my-profile')->with('success', 'Data berhasil diperbarui! Tunggu admin cek lagi ya.');
+}
 
     /**
      * Update the user's profile information.
@@ -93,30 +105,32 @@ public function index(Request $request): View
     }
 
     public function updateFull(Request $request)
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'bio' => 'nullable|string|max:160',
-            'password' => 'nullable|min:8',
-        ]);
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'city' => 'required|string|max:100',
+        'district' => 'required|string|max:100',
+        'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+    ]);
 
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->bio = $request->bio;
+    // Pakai update() langsung ke objek user
+    $user->update([
+        'name' => $request->name,
+        'username' => $request->username,
+        'city' => $request->city,
+        'district' => $request->district,
+        'bio' => $request->bio,
+    ]);
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->save();
-
-        return back()->with('success', 'Profil kamu berhasil diperbarui!');
+    // Jika ada ganti password
+    if ($request->filled('password')) {
+        $user->update(['password' => Hash::make($request->password)]);
     }
+
+    return back()->with('success', 'Profil berhasil diupdate!');
+}
 
     public function showVerificationForm()
     {

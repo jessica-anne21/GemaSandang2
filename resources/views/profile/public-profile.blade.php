@@ -21,21 +21,27 @@
                         <div>
                             <h1 class="h2 fw-bold mb-1" style="font-family: 'Playfair Display', serif; color: #8b6262;">
                                 {{ $user->name }}
-                                @if($user->isVerified())
+                                @if($user->verification && $user->verification->status == 'verified')
                                     <i class="bi bi-patch-check-fill text-primary ms-1" style="font-size: 1.5rem;" title="Verified User"></i>
                                 @endif
                             </h1>
-                            <p class="text-muted mb-3 small">@ {{ $user->username }}</p>
+                            <p class="text-muted mb-2 small">@ {{ $user->username }}</p>
+                            
+                            {{-- TAMPILAN LOKASI (Kota & Kecamatan saja) --}}
+                            <div class="d-flex align-items-center text-secondary small mb-3">
+                                <i class="bi bi-geo-alt-fill me-1" style="color: #8b6262;"></i>
+                                <span>{{ $user->district ?? 'Kecamatan' }}, {{ $user->city ?? 'Kota' }}</span>
+                            </div>
                         </div>
-                        
                     </div>
 
                     <p class="text-secondary mb-4" style="font-style: italic; max-width: 600px; line-height: 1.6;">
-                        {{ $user->bio ?? ' ' }}
+                        {{ $user->bio ?? 'User ini belum menulis bio.' }}
                     </p>
 
-                    <div class="d-flex gap-3 flex-wrap text-muted small">
+                    <div class="d-flex gap-4 flex-wrap text-muted small">
                         <span><i class="bi bi-calendar3 me-2"></i> Bergabung {{ $user->created_at->format('M Y') }}</span>
+                        <span><i class="bi bi-box-seam me-2"></i> {{ $userProducts->count() }} Koleksi</span>
                     </div>
                 </div>
             </div>
@@ -46,9 +52,6 @@
             <div class="col">
                 <div class="d-flex align-items-center gap-3">
                     <h3 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #8b6262;">Lemari Virtual {{ $user->name }}</h3>
-                    <span class="badge rounded-pill px-3 py-2" style="background-color: #8b6262; font-size: 0.8rem;">
-                        {{ $userProducts->count() }} Items
-                    </span>
                 </div>
                 <hr style="width: 60px; border: 2px solid #8b6262; opacity: 1;" class="mt-2">
             </div>
@@ -72,6 +75,8 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
                                 <span class="small fw-bold text-maroon">{{ $item->kondisi }}</span>
+                                
+                                {{-- Link ke Detail Barter --}}
                                 <a href="{{ url('/barter/'.$item->id) }}" class="btn btn-sm text-decoration-none fw-bold p-0 text-maroon">
                                     Ajak Barter <i class="bi bi-arrow-right small"></i>
                                 </a>
@@ -83,7 +88,7 @@
                 <div class="col-12 text-center">
                     <div class="py-5 bg-white rounded-4 shadow-sm border border-dashed mx-auto" style="max-width: 500px;">
                         <i class="bi bi-archive text-muted" style="font-size: 3.5rem; opacity: 0.2;"></i>
-                        <p class="mt-3 text-muted fw-light px-3">Masih kosong nih.</p>
+                        <p class="mt-3 text-muted fw-light px-3">Sepertinya {{ $user->name }} belum memajang koleksi di lemarinya.</p>
                     </div>
                 </div>
             @endforelse
@@ -99,6 +104,5 @@
     .product-card { transition: all 0.3s ease; }
     .product-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
     .border-dashed { border: 2px dashed #e9ecef !important; }
-    .btn-outline-secondary:hover { background-color: #8b6262; border-color: #8b6262; color: white; }
 </style>
 @endsection

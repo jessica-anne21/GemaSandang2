@@ -15,6 +15,7 @@ class UserVerification extends Model
         'user_id', 
         'nik', 
         'ktp_path', 
+        'selfie_path',
         'status', 
         'rejection_reason'
     ];

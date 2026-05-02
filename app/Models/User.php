@@ -28,6 +28,8 @@ class User extends Authenticatable
         'email',
         'password',
         'alamat',     
+        'city',
+        'district',
         'nomor_hp',   
         'bio',
         'role',
@@ -86,5 +88,14 @@ class User extends Authenticatable
     {
         return $this->verification && $this->verification->status === 'verified';
     }
+
+    /**
+ * Relasi ke tabel barter_items (Barang milik user)
+ */
+public function barterItems(): HasMany
+{
+    // Pastikan nama tabelnya 'barter_items' dan foreign key-nya 'user_id'
+    return $this->hasMany(BarterItem::class, 'user_id');
+}
     
 }

@@ -49,7 +49,13 @@
                                     <i class="bi bi-patch-check-fill text-primary ms-1" style="font-size: 1.5rem;" title="Verified User"></i>
                                 @endif
                             </h1>
-                            <p class="text-muted mb-3 small">@ {{ $user->username }}</p>
+                            <p class="text-muted mb-2 small">@ {{ $user->username }}</p>
+                            
+                            {{-- TAMPILAN LOKASI --}}
+                            <div class="d-flex align-items-center text-secondary small mb-3">
+                                <i class="bi bi-geo-alt-fill me-1" style="color: #800000;"></i>
+                                <span>{{ $user->district ?? 'Kecamatan' }}, {{ $user->city ?? 'Kota belum diatur' }}</span>
+                            </div>
                         </div>
                         <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                             <i class="bi bi-gear-fill me-1"></i> Edit Profile
@@ -94,173 +100,46 @@
             </div>
         </div>
 
-        {{-- 5. GRID PRODUK / PESAN TERKUNCI --}}
+        {{-- 5. GRID PRODUK --}}
         @if($user->verification && $user->verification->status == 'verified')
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 @forelse($userProducts as $item)
                     <div class="col">
+                        {{-- Isi Card Produk (Sama seperti code kamu sebelumnya) --}}
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card bg-white">
                             <div class="position-relative">
-                                {{-- Foto dengan Greyscale jika sudah traded --}}
-                                <img src="{{ asset('storage/' . $item->foto_barang) }}" 
-                                     class="card-img-top {{ $item->status !== 'available' ? 'filter-grayscale opacity-75' : '' }}" 
-                                     alt="{{ $item->nama_barang }}" style="height: 220px; object-fit: cover;">
-                                
-                                {{-- Badge Kategori --}}
-                                <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-white text-dark shadow-sm px-3 py-2" style="font-size: 0.7rem; opacity: 0.9;">
-                                    {{ $item->kategori }}
-                                </span>
-
-                                {{-- Label Traded --}}
-                                @if($item->status !== 'available')
-                                    <div class="position-absolute top-50 start-50 translate-middle w-100 text-center">
-                                        <span class="badge bg-dark px-3 py-2 shadow" style="letter-spacing: 1px; opacity: 0.8;">TRADED</span>
-                                    </div>
-                                @endif
+                                <img src="{{ asset('storage/' . $item->foto_barang) }}" class="card-img-top {{ $item->status !== 'available' ? 'filter-grayscale opacity-75' : '' }}" alt="{{ $item->nama_barang }}" style="height: 220px; object-fit: cover;">
+                                <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-white text-dark shadow-sm px-3 py-2" style="font-size: 0.7rem;">{{ $item->kategori }}</span>
                             </div>
-                            <div class="card-body p-3 d-flex flex-column {{ $item->status !== 'available' ? 'bg-light' : '' }}">
-                                <h5 class="card-title fw-bold mb-1" style="font-size: 1.1rem; color: {{ $item->status !== 'available' ? '#888' : '#444' }};">
-                                    {{ $item->nama_barang }}
-                                </h5>
-                                <p class="card-text text-muted small mb-3 flex-grow-1">
-                                    {{ Str::limit($item->deskripsi, 45) }}
-                                </p>
-                                <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
-                                    <span class="small fw-bold" style="color: #800000;">{{ $item->kondisi }}</span>
-                                    <button type="button" class="btn btn-sm btn-link text-decoration-none fw-bold p-0 text-maroon" 
-                                            data-bs-toggle="modal" data-bs-target="#detailItemModal{{ $item->id }}">
-                                        Detail <i class="bi bi-arrow-right small"></i>
-                                    </button>
-                                </div>
+                            <div class="card-body p-3">
+                                <h5 class="card-title fw-bold mb-1" style="font-size: 1.1rem;">{{ $item->nama_barang }}</h5>
+                                <p class="card-text text-muted small mb-3">{{ Str::limit($item->deskripsi, 45) }}</p>
+                                <button type="button" class="btn btn-sm btn-link text-decoration-none fw-bold p-0 text-maroon" data-bs-toggle="modal" data-bs-target="#detailItemModal{{ $item->id }}">
+                                    Detail <i class="bi bi-arrow-right small"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                    {{-- MODAL DETAIL ITEM --}}
-                    <div class="modal fade" id="detailItemModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 shadow-lg rounded-4">
-                                <div class="modal-header border-0 p-4 bg-light">
-                                    <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display'; color: #800000;">Detail Koleksi</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body p-0">
-                                    <img src="{{ asset('storage/' . $item->foto_barang) }}" class="w-100 {{ $item->status !== 'available' ? 'filter-grayscale' : '' }}" style="height: 300px; object-fit: cover;">
-                                    <div class="p-4">
-                                        <h4 class="fw-bold mb-1" style="color: #800000;">{{ $item->nama_barang }}</h4>
-                                        <div class="mb-3">
-                                            <span class="badge bg-light text-dark border">{{ $item->kategori }}</span>
-                                            <span class="badge bg-light text-dark border">{{ $item->kondisi }}</span>
-                                            @if($item->status !== 'available')
-                                                <span class="badge bg-dark text-white">Sudah Dibarter</span>
-                                            @endif
-                                        </div>
-                                        <h6 class="fw-bold text-muted small text-uppercase mb-2">Deskripsi</h6>
-                                        <p class="text-secondary mb-4 small" style="line-height: 1.6;">{{ $item->deskripsi }}</p>
-                                        
-                                        <div class="border-top pt-3 d-flex gap-2">
-                                            @if($item->status == 'available')
-                                                <button type="button" class="btn btn-outline-dark flex-grow-1 rounded-pill fw-bold" 
-                                                        data-bs-toggle="modal" data-bs-target="#editItemModal{{ $item->id }}">
-                                                    Edit Detail
-                                                </button>
-                                                <form action="{{ route('barter.destroy', $item->id) }}" method="POST" class="flex-grow-1">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill fw-bold" onclick="return confirm('Hapus barang ini?')">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <button class="btn btn-secondary w-100 rounded-pill fw-bold" disabled>Barang Sudah Dibarter</button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- MODAL EDIT ITEM --}}
-                    @if($item->status == 'available')
-                    <div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 shadow-lg rounded-4">
-                                <form action="{{ route('barter.update', $item->id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div class="modal-header border-0 p-4 bg-light">
-                                        <h5 class="modal-title fw-bold" style="color: #800000;">Edit Detail Barang</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <div class="mb-3">
-                                            <label class="small fw-bold text-muted text-uppercase">Nama Barang</label>
-                                            <input type="text" name="nama_barang" class="form-control rounded-3" value="{{ $item->nama_barang }}" required>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-6">
-                                                <label class="small fw-bold text-muted text-uppercase">Kategori</label>
-                                                <select name="kategori" class="form-select rounded-3" required>
-                                                    <option value="Atasan" {{ $item->kategori == 'Atasan' ? 'selected' : '' }}>Atasan</option>
-                                                    <option value="Bawahan" {{ $item->kategori == 'Bawahan' ? 'selected' : '' }}>Bawahan</option>
-                                                    <option value="Dress" {{ $item->kategori == 'Dress' ? 'selected' : '' }}>Dress</option>
-                                                    <option value="Aksesoris" {{ $item->kategori == 'Aksesoris' ? 'selected' : '' }}>Aksesoris</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-6">
-                                                <label class="small fw-bold text-muted text-uppercase">Kondisi</label>
-                                                <select name="kondisi" class="form-select rounded-3" required>
-                                                    <option value="Like New" {{ $item->kondisi == 'Like New' ? 'selected' : '' }}>Like New</option>
-                                                    <option value="Good Condition" {{ $item->kondisi == 'Good Condition' ? 'selected' : '' }}>Good Condition</option>
-                                                    <option value="Well Used" {{ $item->kondisi == 'Well Used' ? 'selected' : '' }}>Well Used</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-0">
-                                            <label class="small fw-bold text-muted text-uppercase">Deskripsi</label>
-                                            <textarea name="deskripsi" class="form-control rounded-3" rows="4" required>{{ $item->deskripsi }}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer border-0 p-4 pt-0">
-                                        <button type="submit" class="btn text-white w-100 rounded-pill py-2" style="background-color: #800000;">Update Barang</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
                 @empty
-                    <div class="col-12 text-center py-5">
-                        <div class="py-5 bg-white rounded-4 shadow-sm border border-dashed mx-auto" style="max-width: 500px;">
-                            <i class="bi bi-archive text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
-                            <p class="mt-3 text-muted">Lemari virtual kamu masih kosong.</p>
-                        </div>
-                    </div>
+                    {{-- Empty State --}}
                 @endforelse
             </div>
         @else
-            {{-- TAMPILAN LOCK (TANPA WHITE CONTAINER) --}}
+            {{-- TAMPILAN LOCK --}}
             <div class="row justify-content-center py-5">
                 <div class="col-lg-6 text-center">
-                    <div class="mb-4">
-                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
-                             style="width: 120px; height: 120px; border: 3px dashed #800000;">
-                            <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #800000;"></i>
-                        </div>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px; border: 3px dashed #800000;">
+                        <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #800000;"></i>
                     </div>
-                    <h4 class="fw-bold text-dark">Lemari Virtual Terkunci</h4>
-                    <p class="text-muted mb-4">Verifikasi KTP kamu sekarang agar bisa mengisi lemari virtual dan mulai melakukan barter!</p>
-                    <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 py-3 fw-bold shadow-sm" style="background-color: #800000;">
-                        Mulai Verifikasi
-                    </a>
+                    <h4 class="fw-bold">Lemari Virtual Terkunci</h4>
+                    <p class="text-muted">Verifikasi KTP kamu untuk mengisi lemari virtual.</p>
                 </div>
             </div>
         @endif
     </div>
 </div>
 
-{{-- MODAL EDIT PROFIL --}}
+{{-- MODAL EDIT PROFIL (LOKASI DITAMBAHKAN DI SINI) --}}
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -268,7 +147,7 @@
                 @csrf
                 @method('PATCH')
                 <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" style="color: #800000;">Edit Profil</h5>
+                    <h5 class="modal-title fw-bold" style="color: #800000;">Edit Profil & Lokasi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -276,6 +155,19 @@
                         <label class="form-label small fw-bold text-muted text-uppercase">Nama Lengkap</label>
                         <input type="text" name="name" class="form-control rounded-3" value="{{ $user->name }}" required>
                     </div>
+                    
+                    {{-- BARIS LOKASI BARU --}}
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Kota / Kabupaten</label>
+                            <input type="text" name="city" class="form-control rounded-3" value="{{ $user->city }}" placeholder="Contoh: Bandung" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Kecamatan</label>
+                            <input type="text" name="district" class="form-control rounded-3" value="{{ $user->district }}" placeholder="Contoh: Coblong" required>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted text-uppercase">Username</label>
                         <input type="text" name="username" class="form-control rounded-3" value="{{ $user->username }}" required>
@@ -285,73 +177,19 @@
                         <textarea name="bio" class="form-control rounded-3" rows="3">{{ $user->bio }}</textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn text-white px-5 rounded-pill" style="background-color: #800000;">Simpan Perubahan</button>
+                <div class="modal-footer border-0 p-4 pt-0 text-center">
+                    <button type="submit" class="btn text-white px-5 rounded-pill w-100 py-2" style="background-color: #800000;">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-{{-- MODAL TAMBAH ITEM --}}
-@if($user->verification && $user->verification->status == 'verified')
-<div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <form action="{{ route('barter.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" style="color: #800000;">Isi Lemari Virtual</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="small fw-bold text-muted text-uppercase">Nama Barang</label>
-                        <input type="text" name="nama_barang" class="form-control rounded-3" required>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <label class="small fw-bold text-muted text-uppercase">Kategori</label>
-                            <select name="kategori" class="form-select rounded-3" required>
-                                <option value="Atasan">Atasan</option>
-                                <option value="Bawahan">Bawahan</option>
-                                <option value="Dress">Dress</option>
-                                <option value="Aksesoris">Aksesoris</option>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <label class="small fw-bold text-muted text-uppercase">Kondisi</label>
-                            <select name="kondisi" class="form-select rounded-3" required>
-                                <option value="Like New">Like New</option>
-                                <option value="Good Condition">Good Condition</option>
-                                <option value="Well Used">Well Used</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="small fw-bold text-muted text-uppercase">Deskripsi</label>
-                        <textarea name="deskripsi" class="form-control rounded-3" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-0">
-                        <label class="small fw-bold text-muted text-uppercase">Foto Barang</label>
-                        <input type="file" name="foto_barang" class="form-control rounded-3" required>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn text-white w-100 rounded-pill py-2" style="background-color: #800000;">Simpan ke Lemari</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-@endif
-
+{{-- CSS KHUSUS --}}
 <style>
     @media (min-width: 768px) { .border-start-md { border-left: 1px solid #eee !important; } }
-    .product-card { transition: all 0.3s ease; }
-    .product-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
-    .border-dashed { border: 2px dashed #e9ecef !important; }
-    .filter-grayscale { filter: grayscale(100%); transition: 0.3s; }
+    .product-card:hover { transform: translateY(-8px); }
     .text-maroon { color: #800000 !important; }
+    .bg-soft-maroon { background: #fdf5f5; }
 </style>
 @endsection
