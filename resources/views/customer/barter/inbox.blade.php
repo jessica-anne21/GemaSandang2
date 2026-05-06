@@ -47,15 +47,18 @@
                         <div class="row g-3">
                             @forelse($incomingRequests as $req)
                                 <div class="col-12">
-                                    {{-- Warna Border Berdasarkan Status --}}
                                     @php
                                         $borderColor = 'border-secondary';
+                                        $statusLabel = strtoupper($req->status);
+                                        
                                         if($req->status == 'pending') $borderColor = 'border-warning';
                                         elseif(in_array($req->status, ['accepted', 'on_going', 'completed'])) $borderColor = 'border-success';
-                                        elseif(in_array($req->status, ['rejected', 'cancelled'])) $borderColor = 'border-danger';
+                                        elseif(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc'])) $borderColor = 'border-danger';
+
+                                        if($req->status == 'rejected_qc') $statusLabel = 'GAGAL QC';
                                     @endphp
 
-                                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $borderColor }} {{ in_array($req->status, ['rejected', 'cancelled']) ? 'opacity-75' : '' }}">
+                                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $borderColor }} {{ in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']) ? 'opacity-75' : '' }}">
                                         <div class="row align-items-center">
                                             <div class="col-md-5 d-flex align-items-center gap-3">
                                                 <div class="position-relative">
@@ -69,27 +72,42 @@
                                                     <small class="text-muted d-block small">Barang Penawar: <strong>{{ $req->offeredItem->nama_barang ?? 'N/A' }}</strong></small>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3 text-center">
+                                            <div class="col-md-2 text-center">
                                                 <span class="badge rounded-pill px-3 py-2 fw-bold 
                                                     {{ $req->status == 'pending' ? 'bg-warning text-dark' : '' }}
                                                     {{ in_array($req->status, ['accepted', 'on_going', 'completed']) ? 'bg-success text-white' : '' }}
-                                                    {{ in_array($req->status, ['rejected', 'cancelled']) ? 'bg-danger text-white' : '' }}">
-                                                    {{ strtoupper($req->status) }}
+                                                    {{ in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']) ? 'bg-danger text-white' : '' }}">
+                                                    {{ $statusLabel }}
                                                 </span>
                                             </div>
-                                            <div class="col-md-4 text-end">
-                                                <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold me-1" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $req->id }}">Detail Penawaran</button>
+                                            <div class="col-md-5 text-end">
+                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
+                                                    <a href="{{ route('chat.show', ['user_id' => $req->sender_id, 'barter_id' => $req->id]) }}" 
+                                                       class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold me-1">
+                                                        <i class="bi bi-chat-dots me-1"></i> Chat
+                                                    </a>
+                                                @endif
+
+                                                <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold me-1" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $req->id }}">Detail</button>
                                                 
-                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed']))
-                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #800000;">Kelola Transaksi</a>
+                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
+                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #800000;">Tracking</a>
                                                 @endif
                                             </div>
 
-                                            {{-- Info jika Dibatalkan --}}
-                                            @if($req->status == 'cancelled')
+                                            {{-- INFO ERROR / PENOLAKAN --}}
+                                            @if(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']))
                                                 <div class="col-12 mt-2">
                                                     <div class="p-2 bg-light rounded-3 small text-danger fw-bold border-start border-danger border-3">
-                                                        <i class="bi bi-x-circle-fill me-2"></i>Dibatalkan: {{ $req->cancel_reason ?? 'Tidak ada alasan spesifik.' }}
+                                                        <i class="bi bi-info-circle me-2"></i>
+                                                        @if($req->status == 'rejected')
+                                                            Penawaran ditolak oleh Anda.
+                                                        @elseif($req->status == 'cancelled')
+                                                            Barter dibatalkan oleh partner.
+                                                        @elseif($req->status == 'rejected_qc')
+                                                            Dibatalkan oleh Admin (Gagal QC).
+                                                        @endif
+                                                        <span class="text-muted fw-normal ms-1">({{ $req->cancel_reason ?? $req->admin_note ?? 'Tidak ada catatan tambahan' }})</span>
                                                     </div>
                                                 </div>
                                             @endif
@@ -105,8 +123,8 @@
                                                 <h5 class="modal-title fw-bold" style="color: #800000; font-family: 'Playfair Display';">Review Penawaran</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <div class="modal-body p-4">
-                                                <div class="d-flex justify-content-center align-items-center gap-4 mb-4 border-bottom pb-4 text-center">
+                                            <div class="modal-body p-4 text-center">
+                                                <div class="d-flex justify-content-center align-items-center gap-4 mb-4 border-bottom pb-4">
                                                     <div>
                                                         <img src="{{ asset('storage/' . ($req->requestedItem->foto_barang ?? 'default.jpg')) }}" class="rounded-4 mb-2 shadow-sm" style="width: 140px; height: 140px; object-fit: cover;">
                                                         <p class="small fw-bold text-muted mb-0 text-uppercase" style="font-size: 0.65rem;">Barang Kamu</p>
@@ -130,28 +148,13 @@
                                                         </ul>
                                                     </div>
                                                 </div>
-                                                
                                                 @if($req->status == 'pending')
                                                     <div class="d-flex gap-2 pt-3 border-top">
                                                         <form action="{{ route('barter.reject', $req->id) }}" method="POST" class="flex-grow-1">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger rounded-pill w-100 fw-bold" 
-                                                                    onclick="return confirm('Yakin ingin menolak penawaran ini?')">
-                                                                Tolak Penawaran
-                                                            </button>
+                                                            <button type="submit" class="btn btn-outline-danger rounded-pill w-100 fw-bold" onclick="return confirm('Yakin ingin menolak penawaran ini?')">Tolak Penawaran</button>
                                                         </form>
                                                         <button onclick="kirimOtp({{ $req->id }})" class="btn text-white flex-grow-1 rounded-pill fw-bold btn-accept-{{ $req->id }}" style="background-color: #800000;">Terima & Verifikasi</button>
-                                                    </div>
-                                                    <div id="otp-section-{{ $req->id }}" class="mt-3 p-3 bg-light rounded-4 text-center animate-fade-in" style="display:none;">
-                                                        <h6 class="fw-bold mb-1 text-dark">Konfirmasi Deal</h6>
-                                                        <p class="small text-muted mb-2">Cek email kamu untuk kode OTP.</p>
-                                                        <form action="{{ route('barter.verify-otp', $req->id) }}" method="POST">
-                                                            @csrf
-                                                            <div class="input-group input-group-sm mx-auto shadow-sm" style="max-width: 250px;">
-                                                                <input type="text" name="otp_input" class="form-control text-center fw-bold rounded-start-pill" maxlength="6" placeholder="000000" required>
-                                                                <button class="btn btn-dark rounded-end-pill px-3" type="submit">Verify Deal</button>
-                                                            </div>
-                                                        </form>
                                                     </div>
                                                 @endif
                                             </div>
@@ -174,11 +177,14 @@
                                 <div class="col-12">
                                     @php
                                         $sentBorder = 'border-info';
+                                        $sentLabel = strtoupper($req->status);
                                         if(in_array($req->status, ['accepted', 'on_going', 'completed'])) $sentBorder = 'border-success';
-                                        elseif(in_array($req->status, ['rejected', 'cancelled'])) $sentBorder = 'border-danger';
+                                        elseif(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc'])) $sentBorder = 'border-danger';
+                                        
+                                        if($req->status == 'rejected_qc') $sentLabel = 'GAGAL QC';
                                     @endphp
 
-                                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $sentBorder }} {{ in_array($req->status, ['rejected', 'cancelled']) ? 'opacity-75' : '' }}">
+                                    <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $sentBorder }} {{ in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']) ? 'opacity-75' : '' }}">
                                         <div class="row align-items-center">
                                             <div class="col-md-5 d-flex align-items-center gap-3">
                                                 <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #800000;">
@@ -189,22 +195,36 @@
                                                     <small class="text-muted small">Menawarkan barang: <strong>{{ $req->offeredItem->nama_barang ?? 'N/A' }}</strong></small>
                                                 </div>
                                             </div>
-                                            <div class="col-md-3 text-center">
-                                                <span class="badge rounded-pill px-3 py-2 fw-bold bg-light text-dark border">{{ strtoupper($req->status) }}</span>
+                                            <div class="col-md-2 text-center">
+                                                <span class="badge rounded-pill px-3 py-2 fw-bold bg-light text-dark border">{{ $sentLabel }}</span>
                                             </div>
-                                            <div class="col-md-4 text-end">
-                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed']))
-                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold shadow-sm">Detail Tracking</a>
-                                                @else
+                                            <div class="col-md-5 text-end">
+                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
+                                                    <a href="{{ route('chat.show', ['user_id' => $req->receiver_id, 'barter_id' => $req->id]) }}" 
+                                                       class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold me-1">
+                                                        <i class="bi bi-chat-dots me-1"></i> Chat
+                                                    </a>
+                                                @endif
+
+                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
+                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold shadow-sm">Tracking</a>
+                                                @elseif($req->status == 'pending')
                                                     <span class="small text-muted italic">Menunggu respon partner...</span>
                                                 @endif
                                             </div>
 
-                                            {{-- Info jika Dibatalkan --}}
-                                            @if($req->status == 'cancelled')
+                                            @if(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']))
                                                 <div class="col-12 mt-2">
-                                                    <div class="p-2 bg-light rounded-3 small text-danger fw-bold">
-                                                        <i class="bi bi-info-circle me-1"></i>Dibatalkan: {{ $req->cancel_reason ?? 'Partner membatalkan barter.' }}
+                                                    <div class="p-2 bg-light rounded-3 small text-danger fw-bold border-start border-danger border-3">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        @if($req->status == 'rejected')
+                                                            Penawaran ditolak oleh partner.
+                                                        @elseif($req->status == 'cancelled')
+                                                            Barter dibatalkan oleh partner.
+                                                        @elseif($req->status == 'rejected_qc')
+                                                            Dibatalkan oleh Admin (Gagal QC).
+                                                        @endif
+                                                        <span class="text-muted fw-normal ms-1">({{ $req->cancel_reason ?? $req->admin_note ?? 'Tidak ada catatan tambahan' }})</span>
                                                     </div>
                                                 </div>
                                             @endif
@@ -229,7 +249,6 @@
     function kirimOtp(id) {
         let btn = document.querySelector(`.btn-accept-${id}`);
         let originalText = btn.innerHTML;
-        
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
         btn.disabled = true;
 
@@ -255,7 +274,6 @@
 </script>
 
 <style>
-    /* FIX: Agar teks tab putih saat aktif */
     .nav-pills .nav-link.active { 
         background-color: #800000 !important; 
         color: white !important; 

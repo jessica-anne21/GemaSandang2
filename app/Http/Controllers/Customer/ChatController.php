@@ -7,71 +7,116 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Events\MessageSent;
 use Illuminate\Support\Facades\Auth;
-use App\Models\BarterRequest; // Panggil model request barter kita
+use App\Models\BarterRequest;
+use App\Models\User;
+use App\Models\Message; // Pastikan model yang kita buat tadi dipanggil
 
 class ChatController extends Controller
 {
-    // Menampilkan daftar chat aktif (Hanya yang status barternya Accepted)
-    public function index()
+    /**
+     * Menampilkan daftar chat aktif berdasarkan transaksi barter.
+     * Kita ambil semua status yang sudah 'accepted' ke atas (ongoing, completed, rejected_qc)
+     * agar riwayat chat tidak hilang setelah transaksi selesai.
+     */
+    // Di ChatController.php bagian index()
+public function index()
+{
+    $myId = Auth::id();
+    
+    $chatList = BarterRequest::whereIn('status', ['accepted', 'on_going', 'completed', 'rejected_qc'])
+        ->where(function($q) use ($myId) {
+            $q->where('sender_id', $myId)
+              ->orWhere('receiver_id', $myId);
+        })
+        ->with(['sender', 'receiver', 'requestedItem', 'offeredItem'])
+        // Tambahkan hitungan pesan yang belum dibaca
+        ->withCount(['messages as unread_count' => function($q) use ($myId) {
+            $q->where('receiver_id', $myId)->where('is_read', 0);
+        }])
+        ->latest('updated_at')
+        ->get();
+
+    return view('customer.chat_index', compact('chatList'));
+}
+
+    /**
+     * Menampilkan room chat spesifik untuk satu transaksi barter.
+     */
+    public function show($user_id, $barter_id)
     {
         $myId = Auth::id();
-        
-        $chatList = BarterRequest::where('status', 'accepted')
-            ->where(function($q) use ($myId) {
-                $q->where('sender_id', $myId)
-                  ->orWhere('receiver_id', $myId);
-            })
-            ->with(['sender', 'receiver', 'requestedItem', 'offeredItem'])
-            ->latest()
-            ->get();
+        $partner = User::findOrFail($user_id);
+        $barter = BarterRequest::with(['offeredItem', 'requestedItem'])->findOrFail($barter_id);
 
-        return view('customer.chat_index', compact('chatList'));
-    }
-
-    // Menampilkan room chat spesifik untuk satu transaksi barter
-    public function show($barter_request_id)
-    {
-        $myId = Auth::id();
-        
-        // 1. Cek dulu transaksinya ada gak, dan statusnya accepted gak?
-        $barterInfo = BarterRequest::with(['sender', 'receiver', 'requestedItem', 'offeredItem'])
-                        ->findOrFail($barter_request_id);
-        
-        if($barterInfo->status !== 'accepted') {
-            return redirect()->route('barter.inbox')->with('error', 'Barter belum disetujui!');
+        // Security Check: Pastikan user yang buka chat adalah pelaku barter tersebut
+        if ($barter->sender_id != $myId && $barter->receiver_id != $myId) {
+            abort(403, 'Anda tidak memiliki akses ke percakapan ini.');
         }
 
-        // 2. Tentukan siapa lawannya (kalau kita sender, berarti lawan kita receiver, vice versa)
-        $receiver = ($barterInfo->sender_id == $myId) ? $barterInfo->receiver : $barterInfo->sender;
-
-        // 3. Tarik pesan yang cuma nempel di barter_request_id ini
-        $messages = DB::table('messages')
-            ->where('barter_request_id', $barter_request_id)
+        // Ambil pesan yang HANYA berhubungan dengan transaksi barter ini
+        $messages = Message::where('barter_request_id', $barter_id)
+            ->where(function($q) use ($user_id, $myId) {
+                $q->where('sender_id', $myId)->where('receiver_id', $user_id)
+                  ->orWhere('sender_id', $user_id)->where('receiver_id', $myId);
+            })
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('customer.chat', compact('messages', 'receiver', 'barterInfo'));
+        // Fitur Mark as Read: Tandai semua pesan masuk sebagai terbaca saat dibuka
+        Message::where('barter_request_id', $barter_id)
+            ->where('receiver_id', $myId)
+            ->where('is_read', 0)
+            ->update(['is_read' => 1]);
+
+        return view('customer.chat', compact('partner', 'barter', 'messages'));
     }
 
-    public function sendMessage(Request $request)
-    {
-        try {
-            $data = [
-                'sender_id'         => Auth::id(),
-                'receiver_id'       => $request->receiver_id,
-                'barter_request_id' => $request->barter_request_id, // Masukin ID barternya!
-                'isi_pesan'         => $request->message,
-                'created_at'        => now(),
-            ];
+    /**
+     * Mengirim pesan via AJAX.
+     */
+public function sendMessage(Request $request)
+{
+    // 1. Perbaiki validasi agar teks boleh kosong kalau ada gambar
+    $request->validate([
+        'receiver_id' => 'required',
+        'barter_request_id' => 'required',
+        'message' => 'nullable|string', // nullable berarti boleh kosong
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+    ]);
 
-            DB::table('messages')->insert($data);
-
-            // Kirim event buat Realtime-nya
-            event(new MessageSent($data));
-
-            return response()->json(['status' => 'Success']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+    try {
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            // Simpan ke storage/app/public/chat_images
+            $imagePath = $request->file('image')->store('chat_images', 'public');
         }
+
+        // Jika pesan kosong DAN gambar juga kosong, jangan simpan apa-apa
+        if (!$request->message && !$imagePath) {
+            return response()->json(['status' => 'Error', 'message' => 'Pesan kosong'], 400);
+        }
+
+        // 2. Gunakan Model Message untuk create
+        $message = Message::create([
+            'sender_id'         => auth()->id(),
+            'receiver_id'       => $request->receiver_id,
+            'barter_request_id' => $request->barter_request_id,
+            'isi_pesan'         => $request->message ?? '', // Beri string kosong jika null
+            'image'             => $imagePath,
+            'is_read'           => 0,
+        ]);
+
+        return response()->json([
+            'status' => 'Success',
+            'data'   => [
+                'isi_pesan' => $message->isi_pesan,
+                'image_url' => $message->image ? asset('storage/' . $message->image) : null,
+                'created_at' => $message->created_at->format('H:i')
+            ]
+        ]);
+    } catch (\Exception $e) {
+        // Cek pesan error di tab Preview/Response F12
+        return response()->json(['status' => 'Error', 'message' => $e->getMessage()], 500);
     }
+}
 }

@@ -9,6 +9,9 @@
             <h1 style="font-family: 'Playfair Display', serif; color: #800000; font-weight: 800; font-size: 3rem;">Barter Area</h1>
             <p class="text-muted italic">Tukar koleksimu dengan gaya baru dari lemari user lain.</p>
             <hr style="width: 100px; border: 2px solid #800000; opacity: 1; margin: 20px auto;">
+            <a href="{{ route('barter.guide') }}" class="btn btn-maroon rounded-pill px-4 fw-bold shadow-sm">
+                <i class="bi bi-info-circle me-2"></i> Panduan Barter
+            </a>
         </div>
 
         {{-- ALERT NOTIFIKASI SUKSES --}}
@@ -133,6 +136,24 @@
         pointer-events: auto;
     }
 
+
+    .btn-maroon {
+        background-color: #800000; /* Warna Merah Maroon Gema Sandang */
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-maroon:hover {
+        background-color: #600000; /* Warna Maroon agak gelap pas di-hover */
+        color: white;
+        transform: translateY(-2px); /* Efek melayang dikit */
+        box-shadow: 0 4px 8px rgba(128, 0, 0, 0.2);
+    }
+    
+    .btn-maroon:active {
+        transform: translateY(0);
+    }
     .btn-hover:hover {
         background-color: #600000 !important;
     }

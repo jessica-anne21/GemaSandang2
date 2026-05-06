@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BarterRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class AdminBarterController extends Controller
 {

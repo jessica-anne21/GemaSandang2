@@ -17,6 +17,9 @@ class BarterRequest extends Model
         'message',
         'status',
         'otp_code',
+        'cancel_reason',
+        'cancelled_by',
+        'admin_note',
         'method_selection',        // 'none', 'standard', 'protection'
         'sender_payment_proof',
         'receiver_payment_proof',
@@ -95,5 +98,10 @@ class BarterRequest extends Model
     public function getIsBothShippedAttribute()
     {
         return !empty($this->sender_resi) && !empty($this->receiver_resi);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'barter_request_id');
     }
 }
