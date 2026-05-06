@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container-fluid py-5" style="min-height: 100vh;">
     <div class="container">
         
         {{-- Logika Penentu Status Verifikasi --}}
@@ -34,7 +34,7 @@
             <div class="row align-items-center">
                 <div class="col-md-3 text-center">
                     <div class="rounded-circle shadow-sm mx-auto d-flex align-items-center justify-content-center" 
-                         style="width: 140px; height: 140px; background-color: #800000; border: 4px solid #fdf5f5;">
+                         style="width: 140px; height: 140px; background-color: #8b6262; border: 4px solid #fdf5f5;">
                         <span class="text-white fw-bold" style="font-size: 45px; font-family: 'Playfair Display', serif;">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </span>
@@ -44,7 +44,7 @@
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
                             <div class="d-flex align-items-center mb-1">
-                                <h1 class="h2 fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #800000;">{{ $user->name }}</h1>
+                                <h1 class="h2 fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #8b6262;">{{ $user->name }}</h1>
                                 @if($isVerified)
                                     <span class="ms-2 badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill" style="font-size: 0.65rem;">
                                         <i class="bi bi-patch-check-fill me-1"></i> VERIFIED
@@ -53,7 +53,7 @@
                             </div>
                             <p class="text-muted mb-2 small">@ {{ $user->username }}</p>
                             <div class="d-flex align-items-center text-secondary small mb-3">
-                                <i class="bi bi-geo-alt-fill me-1" style="color: #800000;"></i>
+                                <i class="bi bi-geo-alt-fill me-1" style="color: #8b6262;"></i>
                                 <span>{{ $user->district ?? 'Kecamatan' }}, {{ $user->city ?? 'Kota' }}</span>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                     <p class="text-secondary mb-4 small" style="font-style: italic; max-width: 600px;">"{{ $user->bio ?? 'Belum ada bio.' }}"</p>
                     
                     @if($isVerified)
-                        <button class="btn text-white px-4 rounded-pill shadow-sm py-2 fw-bold transition-hover" style="background-color: #800000;" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                        <button class="btn text-white px-4 rounded-pill shadow-sm py-2 fw-bold transition-hover" style="background-color: #8b6262;" data-bs-toggle="modal" data-bs-target="#addItemModal">
                             <i class="bi bi-plus-lg me-2"></i> Tambah Item Barter
                         </button>
                     @else
@@ -76,8 +76,8 @@
 
         <div class="row mb-4">
             <div class="col">
-                <h3 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #800000;">Lemari Virtual</h3>
-                <hr style="width: 50px; border: 2px solid #800000; opacity: 1;" class="mt-2">
+                <h3 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #8b6262;">Lemari Virtual</h3>
+                <hr style="width: 50px; border: 2px solid #8b6262; opacity: 1;" class="mt-2">
             </div>
         </div>
 
@@ -90,7 +90,7 @@
                         <i class="bi bi-shield-lock-fill text-maroon fs-1 mb-3 d-block"></i>
                         <h5 class="fw-bold text-dark mb-2">Akses Terbatas</h5>
                         <p class="small text-muted mb-4">Selesaikan verifikasi identitas untuk<br>mengelola item di lemari virtualmu.</p>
-                        <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 fw-bold" style="background-color: #800000;">Verifikasi Sekarang</a>
+                        <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 fw-bold" style="background-color: #8b6262;">Verifikasi Sekarang</a>
                     </div>
                 </div>
             @endif
@@ -155,7 +155,7 @@
                                             </div>
                                             <p class="text-secondary small mb-4">{{ $item->deskripsi }}</p>
                                             <div class="d-flex gap-2">
-                                                <button class="btn text-white px-4 rounded-pill shadow-sm py-2 fw-bold" style="background-color: #800000;" onclick="toggleEdit({{ $item->id }})">Edit</button>
+                                                <button class="btn text-white px-4 rounded-pill shadow-sm py-2 fw-bold" style="background-color: #8b6262;" onclick="toggleEdit({{ $item->id }})">Edit</button>
                                                 <form action="{{ route('items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item?')">
                                                     @csrf @method('DELETE')
                                                     <button class="btn btn-outline-danger rounded-pill"><i class="bi bi-trash"></i></button>
@@ -222,7 +222,7 @@
             <form action="{{ route('items.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header border-0 bg-light p-4">
-                    <h5 class="modal-title fw-bold" style="color: #800000;">Tambah Koleksi Barter</h5>
+                    <h5 class="modal-title fw-bold" style="color: #8b6262;">Tambah Koleksi Barter</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -268,7 +268,7 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn text-white w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #800000;">Simpan</button>
+                    <button type="submit" class="btn text-white w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #8b6262;">Simpan</button>
                 </div>
             </form>
         </div>
@@ -285,7 +285,7 @@
                 @method('PATCH')
                 
                 <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" style="color: #800000;">Update Profil & Alamat</h5>
+                    <h5 class="modal-title fw-bold" style="color: #8b6262;">Update Profil & Alamat</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 
@@ -333,7 +333,7 @@
                 </div>
                 
                 <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn text-white w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #800000;">Simpan Perubahan</button>
+                    <button type="submit" class="btn text-white w-100 rounded-pill py-2 fw-bold shadow-sm" style="background-color: #8b6262;">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -348,7 +348,7 @@
     .traded-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 5; }
     .traded-overlay span { font-size: 0.6rem; letter-spacing: 1px; font-weight: 800; }
     .bg-soft-maroon { background: #fff0f0; }
-    .text-maroon { color: #800000; }
+    .text-maroon { color: #8b6262; }
     .animate-fade-in { animation: fadeIn 0.4s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>

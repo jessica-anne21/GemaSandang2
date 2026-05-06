@@ -38,6 +38,16 @@
         </div>
     @endif
 
+    @if($b->status == 'rejected_qc')
+    <div class="alert alert-danger rounded-4 p-3 mb-3 border-0 shadow-sm animate-fade-in">
+        <h6 class="fw-bold x-small text-uppercase mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Status Gagal QC</h6>
+        <p class="mb-1 small">
+            Pelaku: <strong>{{ $b->failed_qc_user_id == $b->sender_id ? $b->sender->name : $b->receiver->name }}</strong>
+        </p>
+        <p class="mb-0 x-small italic text-dark opacity-75">"{{ $b->admin_note }}"</p>
+    </div>
+    @endif
+
     {{-- KONTROL LOGISTIK (Hanya Muncul jika Premium/VVIP & Bukan Status Rejected) --}}
     @if($b->shipping_method !== 'standard' && !in_array($b->status, ['rejected', 'cancelled']))
         <div class="mt-3 pt-2 border-top">

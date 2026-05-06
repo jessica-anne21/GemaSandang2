@@ -2,6 +2,7 @@
 
 @section('styles')
 <style>     
+
     /* Product Card Koleksi Terbaru */
     .product-card {
         transition: transform 0.3s ease, box-shadow 0.3s ease; 
@@ -47,7 +48,7 @@
 @section('content')
 
 {{-- 1. HERO & TRENDING SECTION (SESUAI MOCKUP GAMBAR) --}}
-<div style="background-color: #fdf0f0; padding: 80px 0; overflow: hidden; position: relative;">
+<div style="padding: 80px 0; overflow: hidden; position: relative;">
     <div class="container">
         <div class="row align-items-center">
             
@@ -66,9 +67,9 @@
             </div>
 
             {{-- CONTAINER MAROON KANAN --}}
-<div class="col-lg-8">
-    <div style="background-color: #8b6262; border-radius: 50px 0 0 50px; padding: 60px 0 60px 50px; margin-right: -300px; position: relative;">
-        
+        <div class="col-lg-8">
+        <div style="background-color: #8b6262; border-radius: 50px 0 0 50px; padding: 60px 0 60px 50px; margin-right: -300px; position: relative;">
+            
         {{-- HORIZONTAL SCROLL CARDS --}}
         {{-- TAMBAHAN: flex-wrap-nowrap biar dia maksa ke samping --}}
         <div class="d-flex flex-nowrap overflow-auto no-scrollbar" style="gap: 30px; padding-right: 300px; padding-bottom: 20px; scroll-behavior: smooth;">
@@ -140,12 +141,12 @@
 </div>
 
 {{-- 3. KOLEKSI TERBARU --}}
-<div class="container my-5">
+<div class="container my-5" >
     <div class="row text-center mb-5">
         <div class="col">
-            <h2 style="font-family: 'Playfair Display', serif; color: #800000; font-size: 2.5rem; font-weight: 700;">Koleksi Terbaru</h2>
+            <h2 style="font-family: 'Playfair Display', serif; color: #8b6262; font-size: 2.5rem; font-weight: 700;">Koleksi Terbaru</h2>
             <p class="text-muted">Temukan gaya unik Anda dari koleksi pilihan kami.</p>
-            <hr style="width: 80px; border: 2px solid #800000; opacity: 1; margin: 15px auto;">
+            <hr style="width: 80px; border: 2px solid #8b6262; opacity: 1; margin: 15px auto;">
         </div>
     </div>
 
@@ -167,17 +168,17 @@
                         </div>
                         <h6 class="fw-bold text-dark mb-3" style="font-size: 1.1rem;">{{ $product->nama_produk }}</h6>
                         <div class="mt-auto">
-                            <h5 class="fw-bold mb-3" style="color: #800000;">
+                            <h5 class="fw-bold mb-3" style="color: #8b6262;">
                                 Rp {{ number_format($product->harga, 0, ',', '.') }}
                             </h5>
                             <div class="d-grid gap-2">
-                                <a href="{{ route('product.show', $product) }}" class="btn btn-outline-dark btn-sm rounded-pill py-2 fw-bold">Detail</a>
+                                <a href="{{ route('product.show', $product) }}" class="btn btn-sm text-white rounded-pill py-2 fw-bold" style="background-color: #8b6262;">Detail</a>
                                 @if($product->stok > 0)
                                     @auth
                                         <form action="{{ route('cart.store') }}" method="POST" class="d-grid">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="btn btn-sm text-white rounded-pill py-2 fw-bold" style="background-color: #800000;">
+                                            <button type="submit" class="btn btn-sm text-white rounded-pill py-2 fw-bold" style="background-color: #8b6262;">
                                                 <i class="bi bi-cart-plus me-1"></i> Beli Sekarang
                                             </button>
                                         </form>

@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container py-5" style="min-height: 100vh;">
     <div class="row g-0 shadow-sm rounded-4 overflow-hidden bg-white position-relative" style="height: 75vh;">
 
         @php
@@ -15,12 +15,12 @@
             <div class="text-center p-5 shadow-lg bg-white rounded-4 border" style="max-width: 400px;">
                 <div class="mb-3">
                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
-                        <i class="bi bi-lock-fill" style="font-size: 2.5rem; color: #800000;"></i>
+                        <i class="bi bi-lock-fill" style="font-size: 2.5rem; color: #8b6262;"></i>
                     </div>
                 </div>
                 <h5 class="fw-bold text-dark">Fitur Chat Terkunci</h5>
                 <p class="text-muted small mb-4">Demi keamanan transaksi barter, kamu wajib verifikasi KTP terlebih dahulu untuk mengakses fitur pesan.</p>
-                <a href="{{ route('profile.my-profile') }}" class="btn text-white px-4 fw-bold rounded-pill" style="background-color: #800000;">
+                <a href="{{ route('profile.my-profile') }}" class="btn text-white px-4 fw-bold rounded-pill" style="background-color: #8b6262;">
                     Verifikasi Sekarang
                 </a>
             </div>
@@ -30,10 +30,9 @@
         {{-- Sidebar: Daftar Chat --}}
         <div class="col-md-4 border-end bg-light d-flex flex-column">
             <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0" style="color: #800000;">
+                <h5 class="fw-bold mb-0" style="color: #8b6262;">
                     <i class="bi bi-chat-square-dots-fill me-2"></i> Pesan Barter
                 </h5>
-                <span class="badge rounded-pill bg-success small">Deal Only</span>
             </div>
 
             <div class="overflow-auto h-100 no-scrollbar">
@@ -48,12 +47,12 @@
                        class="d-flex align-items-center p-3 text-decoration-none border-bottom hover-bg-white position-relative {{ request()->is('chat/user/'.$opponent->id.'/barter/'.$chat->id) ? 'bg-white border-start border-4 border-maroon-active' : '' }}">
                         
                         <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center me-3 position-relative" 
-                             style="width: 52px; height: 52px; border: 2px solid #800000; flex-shrink: 0; overflow: visible;">
+                             style="width: 52px; height: 52px; border: 2px solid #8b6262; flex-shrink: 0; overflow: visible;">
                             
                             @if($opponent->profile_photo)
                                 <img src="{{ asset('storage/' . $opponent->profile_photo) }}" class="rounded-circle" style="width:100%; height:100%; object-fit:cover;">
                             @else
-                                <span class="fw-bold" style="color: #800000;">{{ strtoupper(substr($opponent->name, 0, 1)) }}</span>
+                                <span class="fw-bold" style="color: #8b6262;">{{ strtoupper(substr($opponent->name, 0, 1)) }}</span>
                             @endif
 
                             {{-- NOTIFIKASI DOT (Jika ada unread) --}}
@@ -90,7 +89,7 @@
             <div>
                 <div class="mb-3">
                     <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 100px; height: 100px;">
-                        <i class="bi bi-chat-heart" style="font-size: 3rem; color: #800000;"></i>
+                        <i class="bi bi-chat-heart" style="font-size: 3rem; color: #8b6262;"></i>
                     </div>
                 </div>
                 <h5 class="fw-bold text-dark">Pilih pesan untuk mulai mengobrol</h5>
@@ -103,8 +102,8 @@
 <style>
     .hover-bg-white:hover { background-color: #fff !important; transition: 0.3s; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .border-maroon-active { border-left: 4px solid #800000 !important; background-color: white !important; }
-    .text-maroon { color: #800000 !important; }
+    .border-maroon-active { border-left: 4px solid #8b6262 !important; background-color: white !important; }
+    .text-maroon { color: #8b6262 !important; }
     
     /* Animasi pulse untuk unread badge */
     .bg-danger {

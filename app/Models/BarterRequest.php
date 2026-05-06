@@ -20,6 +20,7 @@ class BarterRequest extends Model
         'cancel_reason',
         'cancelled_by',
         'admin_note',
+        'failed_qc_user_id',
         'method_selection',        // 'none', 'standard', 'protection'
         'sender_payment_proof',
         'receiver_payment_proof',

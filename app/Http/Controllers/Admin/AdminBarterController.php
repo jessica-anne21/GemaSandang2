@@ -96,30 +96,34 @@ class AdminBarterController extends Controller
 }
 
 public function rejectQC(Request $request, $id) {
-        $barter = BarterRequest::findOrFail($id);
-        $rejectedUser = $request->rejected_user_id; // ID User yang barangnya zonk
+    $barter = BarterRequest::findOrFail($id);
+    
+    // Ambil ID user yang dipilih admin sebagai penyebab gagal QC
+    // Pastikan nama variabel sesuai dengan 'name' di form (failed_qc_user_id)
+    $rejectedUser = $request->failed_qc_user_id; 
 
-        DB::transaction(function () use ($barter, $rejectedUser, $request) {
-            // 1. Tandai transaksi gagal QC
-            $barter->update([
-                'status' => 'rejected_qc',
-                'admin_note' => $request->reason // Alasan misal: "Baju robek di ketiak"
-            ]);
+    DB::transaction(function () use ($barter, $rejectedUser, $request) {
+        // 1. Tandai transaksi gagal QC
+        $barter->update([
+            'status' => 'rejected_qc',
+            'admin_note' => $request->admin_note, // Sesuai name="admin_note" di form
+            'failed_qc_user_id' => $rejectedUser, // Simpan ID pelakunya
+        ]);
 
-            // 2. Balikkan status barang ke Available lagi (biar mereka bisa perbaiki deskripsi)
-            $barter->offeredItem->update(['status' => 'available']);
-            $barter->requestedItem->update(['status' => 'available']);
-            
-            // 3. Logika Refund Biaya Layanan
-            if ($rejectedUser == $barter->sender_id) {
-                // Sender salah -> Receiver (Korban) dapet status refund
-                $barter->update(['receiver_payment_status' => 'refunded']);
-            } else {
-                // Receiver salah -> Sender (Korban) dapet status refund
-                $barter->update(['sender_payment_status' => 'refunded']);
-            }
-        });
+        // 2. Balikkan status barang ke Available lagi agar bisa ditransaksikan ulang
+        $barter->offeredItem->update(['status' => 'available']);
+        $barter->requestedItem->update(['status' => 'available']);
+        
+        // 3. Logika Refund Biaya Layanan untuk Korban
+        if ($rejectedUser == $barter->sender_id) {
+            // Sender salah -> Receiver (Korban) dapet status refund
+            $barter->update(['receiver_payment_status' => 'refunded']);
+        } else {
+            // Receiver salah -> Sender (Korban) dapet status refund
+            $barter->update(['sender_payment_status' => 'refunded']);
+        }
+    });
 
-        return back()->with('success', 'QC ditolak. Instruksi pengembalian barang dikirim ke user.');
-    }
+    return back()->with('success', 'QC ditolak. Instruksi pengembalian barang dikirim ke user.');
+}    
 }

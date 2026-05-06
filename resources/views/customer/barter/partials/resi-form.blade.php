@@ -6,14 +6,19 @@
     
     $hasIConfirmed = $isSender ? $barter->sender_confirmed_at : $barter->receiver_confirmed_at;
     $hasPartnerConfirmed = $isSender ? $barter->receiver_confirmed_at : $barter->sender_confirmed_at;
+
+    // Resi Admin yang arahnya ke SAYA (buat syarat terima barang)
+    $adminResiToMe = $isSender ? $barter->resi_from_admin_to_sender : $barter->resi_from_admin_to_receiver;
     
     // Logic Tombol Konfirmasi Muncul
     if($barter->method_selection == 'protection') {
-        // Harus resi balik admin ke SENDER & RECEIVER ada semua
-        $canConfirm = ($barter->resi_from_admin_to_sender && $barter->resi_from_admin_to_receiver);
+        // PROTECTION: Tombol muncul hanya jika Admin sudah kirim barang ke SAYA
+        $canConfirm = !empty($adminResiToMe);
+        $lockMessage = "Tombol konfirmasi aktif setelah barang dikirim balik oleh Admin ke alamatmu.";
     } else {
-        // Cukup resi kedua pihak (direct)
-        $canConfirm = ($barter->sender_resi && $barter->receiver_resi);
+        // STANDARD: Tombol muncul jika PARTNER sudah input resi kirim langsung
+        $canConfirm = !empty($partnerResi);
+        $lockMessage = "Tombol konfirmasi aktif setelah " . explode(' ', $partnerName)[0] . " menginput nomor resi.";
     }
 @endphp
 
@@ -34,45 +39,44 @@
             </div>
             @if($myResi)
                 <div class="mt-2 d-flex align-items-center text-success x-small fw-bold">
-                    <i class="bi bi-check-circle-fill me-1"></i> Tersimpan: {{ $myResi }}
+                    <i class="bi bi-check-circle-fill me-1"></i> Resi Anda Tersimpan
                 </div>
             @endif
         </form>
     </div>
     @endif
 
-    {{-- 2. STATUS LOGISTIK PARTNER --}}
+    {{-- 2. STATUS LOGISTIK PARTNER & ADMIN --}}
     <div class="card border-0 bg-white shadow-sm rounded-4 p-3 mb-4">
         <label class="x-small fw-bold text-muted mb-3 d-block text-uppercase tracking-wider">
-            <i class="bi bi-truck me-1 text-maroon"></i> Logistik {{ explode(' ', $partnerName)[0] }}
+            <i class="bi bi-truck me-1 text-maroon"></i> Status Logistik
         </label>
         
         <div class="d-flex flex-column gap-2">
-            {{-- Status Kiriman Lawan ke Gudang/Partner --}}
+            {{-- Status Kiriman Partner --}}
             <div class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border">
                 <div>
-                    <span class="d-block x-small text-muted">Resi Partner:</span>
-                    <span class="fw-bold text-dark x-small">{{ $partnerResi ?? 'Menunggu...' }}</span>
+                    <span class="d-block x-small text-muted">Resi dari {{ explode(' ', $partnerName)[0] }}:</span>
+                    <span class="fw-bold text-dark x-small">{{ $partnerResi ?? 'Belum ada resi' }}</span>
                 </div>
                 @if($partnerResi)
-                    <span class="badge bg-success rounded-pill x-small px-3">Sudah Kirim</span>
+                    <span class="badge bg-success rounded-pill x-small px-3">Dikirim</span>
                 @else
                     <span class="badge bg-white text-muted border rounded-pill x-small px-3">Pending</span>
                 @endif
             </div>
 
-            {{-- Khusus Protection: Tampilkan Status Balik Gudang ke Partner --}}
+            {{-- Khusus Protection: Status Admin ke Saya --}}
             @if($barter->method_selection == 'protection')
-                @php
-                    $adminResiToPartner = $isSender ? $barter->resi_from_admin_to_receiver : $barter->resi_from_admin_to_sender;
-                @endphp
-                <div class="d-flex justify-content-between align-items-center p-2 rounded-3 bg-light border">
+                <div class="d-flex justify-content-between align-items-center p-2 rounded-3 border {{ $adminResiToMe ? 'bg-soft-success border-success' : 'bg-light' }}">
                     <div>
-                        <span class="d-block x-small text-muted">Gudang ke Partner:</span>
-                        <span class="fw-bold text-dark x-small">{{ $adminResiToPartner ?? 'Proses QC' }}</span>
+                        <span class="d-block x-small text-muted">Resi Admin ke Saya:</span>
+                        <span class="fw-bold text-dark x-small">{{ $adminResiToMe ?? 'Menunggu Verifikasi/QC' }}</span>
                     </div>
-                    @if($adminResiToPartner)
-                        <i class="bi bi-check2-all text-primary fs-5 pe-2"></i>
+                    @if($adminResiToMe)
+                        <i class="bi bi-patch-check-fill text-success fs-5 pe-2"></i>
+                    @else
+                        <div class="spinner-border spinner-border-sm text-muted me-2" role="status"></div>
                     @endif
                 </div>
             @endif
@@ -85,29 +89,36 @@
             @if($canConfirm)
                 @if(!$hasIConfirmed)
                     <div class="alert alert-soft-primary rounded-4 border-0 shadow-sm x-small mb-3 animate-fade-in">
-                        <strong>Barang Siap Dikonfirmasi!</strong><br>
-                        Silakan klik tombol di bawah jika barang sudah Anda terima dan periksa.
+                        <strong>Barang Sudah Sampai?</strong><br>
+                        Pastikan Anda sudah menerima dan mengecek kondisi barang sebelum melakukan konfirmasi.
                     </div>
                     <form action="{{ route('barter.complete', $barter->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-maroon w-100 rounded-pill fw-bold py-3 shadow btn-hover-effect">
+                        <button type="submit" class="btn btn-maroon w-100 rounded-pill fw-bold py-3 shadow">
                             Konfirmasi Terima Barang
                         </button>
                     </form>
                 @else
-                    <div class="text-center p-4 rounded-4 bg-light border border-dashed animate-fade-in">
+                    <div class="text-center p-4 rounded-4 bg-light border border-dashed">
                         <i class="bi bi-clock-history d-block mb-2 text-success fs-3"></i>
-                        <p class="x-small fw-bold mb-0 text-success">Anda Telah Mengonfirmasi</p>
-                        <p class="x-small text-muted mb-0 mt-1 italic">Menunggu konfirmasi dari <strong>{{ $partnerName }}</strong>...</p>
+                        <p class="x-small fw-bold mb-0 text-success">Konfirmasi Terkirim</p>
+                        <p class="x-small text-muted mb-0 mt-1 italic">Menunggu konfirmasi dari partner agar status selesai.</p>
                     </div>
                 @endif
             @else
+                {{-- Tampilan Tombol Terkunci --}}
                 <div class="text-center p-3 rounded-4 bg-light opacity-75 border">
                     <p class="x-small text-muted mb-0 italic">
-                        <i class="bi bi-lock me-1"></i> Tombol konfirmasi aktif setelah barang dikirim balik oleh Admin.
+                        <i class="bi bi-lock me-1"></i> {{ $lockMessage }}
                     </p>
                 </div>
             @endif
         </div>
     @endif
 </div>
+
+<style>
+    .bg-soft-success { background-color: #f0fff4; }
+    .btn-maroon { background-color: #8b6262; color: white; transition: 0.3s; }
+    .btn-maroon:hover { background-color: #7a5555; transform: translateY(-2px); }
+</style>

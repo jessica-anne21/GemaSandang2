@@ -129,19 +129,22 @@
                                 @if($b->shipping_method !== 'standard')
                                     <div class="p-3 rounded-4 bg-soft-maroon border border-maroon border-opacity-25 mb-4 shadow-sm">
                                         <h6 class="fw-bold text-maroon small mb-3 text-uppercase"><i class="bi bi-shield-exclamation me-2"></i>Quality Control (Reject)</h6>
+                                        {{-- Ganti bagian form reject di index.blade.php kamu menjadi seperti ini --}}
                                         <form action="{{ route('admin.barter.reject-qc', $b->id) }}" method="POST">
                                             @csrf
                                             <div class="mb-2">
-                                                <select name="rejected_user_id" class="form-select form-select-sm rounded-pill shadow-none" required>
+                                                {{-- Pastikan name="failed_qc_user_id" --}}
+                                                <select name="failed_qc_user_id" class="form-select form-select-sm rounded-pill shadow-none" required>
                                                     <option value="" disabled selected>Pilih Barang yang Gagal QC</option>
-                                                    <option value="{{ $b->sender_id }}">Barang {{ explode(' ', $b->sender->name)[0] }}</option>
-                                                    <option value="{{ $b->receiver_id }}">Barang {{ explode(' ', $b->receiver->name)[0] }}</option>
+                                                    <option value="{{ $b->sender_id }}">Barang {{ explode(' ', $b->sender->name)[0] }} (Sender)</option>
+                                                    <option value="{{ $b->receiver_id }}">Barang {{ explode(' ', $b->receiver->name)[0] }} (Receiver)</option>
                                                 </select>
                                             </div>
                                             <div class="mb-2">
+                                                {{-- Pastikan name="admin_note" --}}
                                                 <textarea name="admin_note" class="form-control rounded-3 small shadow-none" rows="2" placeholder="Alasan gagal QC..." required></textarea>
                                             </div>
-                                            <button type="submit" class="btn btn-danger btn-sm w-100 rounded-pill fw-bold shadow-sm" onclick="return confirm('Yakin ingin menolak barter ini?')">
+                                            <button type="submit" class="btn btn-danger btn-sm w-100 rounded-pill fw-bold shadow-sm">
                                                 Batalkan & Proses Retur
                                             </button>
                                         </form>

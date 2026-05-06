@@ -134,32 +134,53 @@ class BarterController extends Controller
         try {
             $otp = rand(100000, 999999);
             $barter = BarterRequest::findOrFail($id);
+            
+            // Simpan OTP ke database
             $barter->update(['otp_code' => $otp]);
 
+            // Kirim Email (atau WA jika sudah ada servicenya)
             Mail::to(Auth::user()->email)->send(new BarterOtpMail($otp, 'Persetujuan Barter Gema Sandang'));
 
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Kode OTP berhasil dikirim!'
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Gagal kirim OTP: ' . $e->getMessage()
+            ], 500);
         }
     }
-
     /**
      * Verifikasi OTP & Terima Barter
      */
-    public function verifyAcceptance(Request $request, $id)
+    /**
+     * Verifikasi OTP & Terima Barter
+     * Fungsi ini sekarang sinkron dengan form OTP di Riwayat Barter
+     */
+    public function accept(Request $request, $id)
     {
         $barter = BarterRequest::findOrFail($id);
 
-        if ($request->otp_input == $barter->otp_code) {
+        // Validasi input OTP
+        $request->validate([
+            'otp_code' => 'required|numeric'
+        ]);
+
+        // Cek apakah OTP yang diinput user sama dengan yang ada di database
+        // Kita gunakan $request->otp_code sesuai dengan name="otp_code" di form
+        if ($request->otp_code == $barter->otp_code) {
             $barter->update([
                 'status' => 'accepted',
-                'otp_code' => null 
+                'terms_accepted' => false, // Set ke false dulu biar user milih metode di tracking
+                'otp_code' => null // Hapus OTP setelah berhasil
             ]);
-            return back()->with('success', 'Barter disetujui! Silakan pilih metode pengiriman.');
+
+            return redirect()->route('barter.tracking', $id)->with('success', 'OTP Valid! Silakan pilih metode pengiriman.');
         }
 
-        return back()->with('error', 'Kode OTP salah, Sis!');
+        return back()->with('error', 'Kode OTP salah, Jes! Coba cek Whatsapp/Email lagi ya.');
     }
 
     /**

@@ -1,14 +1,15 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container-fluid py-5" style="min-height: 100vh;">
     <div class="container">
+        
         
         {{-- HEADER --}}
         <div class="text-center mb-5">
-            <h1 style="font-family: 'Playfair Display', serif; color: #800000; font-weight: 800; font-size: 3rem;">Barter Area</h1>
+            <h1 style="font-family: 'Playfair Display', serif; color: #8b6262; font-weight: 800; font-size: 3rem;">Barter Area</h1>
             <p class="text-muted italic">Tukar koleksimu dengan gaya baru dari lemari user lain.</p>
-            <hr style="width: 100px; border: 2px solid #800000; opacity: 1; margin: 20px auto;">
+            <hr style="width: 100px; border: 2px solid #8b6262; opacity: 1; margin: 20px auto;">
             <a href="{{ route('barter.guide') }}" class="btn btn-maroon rounded-pill px-4 fw-bold shadow-sm">
                 <i class="bi bi-info-circle me-2"></i> Panduan Barter
             </a>
@@ -19,9 +20,9 @@
             <div class="row justify-content-center mb-4">
                 <div class="col-lg-7">
                     <div class="alert alert-dismissible fade show border-0 shadow-sm p-3" role="alert" 
-                         style="background-color: #fff; border-left: 4px solid #800000 !important; border-radius: 12px;">
+                         style="background-color: #fff; border-left: 4px solid #8b6262 !important; border-radius: 12px;">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill me-3" style="color: #800000; font-size: 1.2rem;"></i>
+                            <i class="bi bi-check-circle-fill me-3" style="color: #8b6262; font-size: 1.2rem;"></i>
                             <span class="text-dark small fw-medium">{{ session('success') }}</span>
                         </div>
                         <button type="button" class="btn-close small" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem; margin-top: 2px;"></button>
@@ -40,13 +41,13 @@
                 <div class="col-lg-6 text-center">
                     <div class="mb-4">
                         <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" 
-                             style="width: 120px; height: 120px; border: 3px dashed #800000; background-color: white;">
-                            <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #800000;"></i>
+                             style="width: 120px; height: 120px; border: 3px dashed #8b6262; background-color: white;">
+                            <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #8b6262;"></i>
                         </div>
                     </div>
                     <h2 class="fw-bold text-dark" style="font-family: 'Playfair Display';">Akses Barter Terkunci</h2>
                     <p class="text-muted mb-4">Demi keamanan transaksi, silakan verifikasi KTP terlebih dahulu.</p>
-                    <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 py-3 fw-bold shadow-sm" style="background-color: #800000;">
+                    <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 py-3 fw-bold shadow-sm" style="background-color: #8b6262;">
                         Verifikasi Sekarang
                     </a>
                 </div>
@@ -76,7 +77,7 @@
                                 {{-- User & Location Info --}}
                                 <div class="d-flex align-items-center mb-3" style="position: relative; z-index: 2;">
                                     <div class="rounded-circle me-2 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                                         style="width: 35px; height: 35px; background-color: #800000; font-size: 0.8rem;">
+                                         style="width: 35px; height: 35px; background-color: #8b6262; font-size: 0.8rem;">
                                         {{ strtoupper(substr($item->user->name, 0, 1)) }}
                                     </div>
                                     <div class="overflow-hidden">
@@ -97,7 +98,7 @@
 
                                 <div class="mt-auto d-grid" style="position: relative; z-index: 2;">
                                     <button class="btn text-white rounded-pill py-2 fw-bold shadow-sm btn-hover" 
-                                            style="background-color: #800000;">
+                                            style="background-color: #8b6262;">
                                         Ajukan Barter
                                     </button>
                                 </div>
@@ -138,14 +139,14 @@
 
 
     .btn-maroon {
-        background-color: #800000; /* Warna Merah Maroon Gema Sandang */
+        background-color: #8b6262; /* Warna Merah Maroon Gema Sandang */
         color: white;
         border: none;
         transition: all 0.3s ease;
     }
 
     .btn-maroon:hover {
-        background-color: #600000; /* Warna Maroon agak gelap pas di-hover */
+        background-color: #8b6262; /* Warna Maroon agak gelap pas di-hover */
         color: white;
         transform: translateY(-2px); /* Efek melayang dikit */
         box-shadow: 0 4px 8px rgba(128, 0, 0, 0.2);
@@ -155,7 +156,7 @@
         transform: translateY(0);
     }
     .btn-hover:hover {
-        background-color: #600000 !important;
+        background-color: #8b6262 !important;
     }
 
     .alert {

@@ -2,7 +2,7 @@
 
 @section('content')
 {{-- WRAPPER UTAMA --}}
-<div style="width: 100%; display: flex; flex-direction: column; align-items: center; background-color: #fdf5f5; min-height: 100vh; padding-bottom: 80px;">
+<div style="width: 100%; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px;">
     
     {{-- INNER CONTAINER --}}
     <div style="width: 100%; max-width: 1140px; padding: 0 20px;">
@@ -49,8 +49,9 @@
                                 </div>
                                 
                                 <div style="display: flex; align-items: center; gap: 6px; color: #999; font-weight: 600;">
-                                    <i class="bi bi-chat-dots-fill"></i>
-                                    <span>{{ $trend->comments_count ?? 0 }}</span>
+                                    <span>
+                                    <i class="bi bi-chat-dots-fill"></i> {{ count($trend->comments) }}
+                                </span>
                                 </div>
                             </div>
                         </div>

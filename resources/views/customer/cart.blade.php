@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container my-5">
-    <h1 class="display-5 mb-4" style="font-family: 'Playfair Display', serif;">Keranjang Belanja Anda</h1>
+    <h1 class="display-5 mb-4" style="font-family: 'Playfair Display', serif; color: #8b6262;">Keranjang Belanja Anda</h1>
 
     {{-- Notifikasi Sukses --}}
     @if(session('success'))
@@ -101,7 +101,7 @@
         <div class="alert alert-light text-center py-5 border shadow-sm" style="border-radius: 15px;">
             <i class="bi bi-cart-x text-muted" style="font-size: 3rem;"></i>
             <p class="mt-3 text-muted">Keranjang Anda masih kosong.</p>
-            <a href="{{ route('shop') }}" class="btn btn-dark px-4">Lihat Koleksi Produk</a>
+            <a href="{{ route('shop') }}" class="btn btn-dark px-4" style="background-color: #8b6262;">Lihat Koleksi Produk</a>
         </div>
     @endif 
 </div>

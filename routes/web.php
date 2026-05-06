@@ -133,8 +133,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/barter/update-resi/{id}', [BarterController::class, 'updateResi'])->name('barter.update-resi');
     Route::post('/barter/confirm-arrival/{id}', [BarterController::class, 'confirmArrival'])->name('barter.confirm-arrival');
     Route::get('/barter/tracking/{id}', [BarterController::class, 'tracking'])->name('barter.tracking');
-    Route::post('/barter/send-otp/{id?}', [BarterController::class, 'sendOtp'])->name('barter.send-otp');
-    Route::post('/barter/verify-otp/{id}', [BarterController::class, 'verifyAcceptance'])->name('barter.verify-otp');
+    Route::post('/barter/send-otp/{id}', [BarterController::class, 'sendOtp'])->name('barter.send-otp');
+    Route::post('/barter/select-method/{id}', [BarterController::class, 'selectProtection'])->name('barter.select-method');
+    Route::post('/barter/accept/{id}', [BarterController::class, 'accept'])->name('barter.accept');
     Route::post('/barter/select-protection/{id}', [BarterController::class, 'selectProtection'])->name('barter.select-protection');
     Route::post('/barter/reject/{id}', [BarterController::class, 'rejectRequest'])->name('barter.reject');
     Route::post('/barter/complete/{id}', [BarterController::class, 'completeBarter'])->name('barter.complete');

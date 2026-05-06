@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container py-5" style="min-height: 100vh;">
     <div class="row justify-content-center">
         <div class="col-lg-10">
             
@@ -76,7 +76,7 @@
                     {{-- Detail Produk --}}
                     <div class="col-md-6 bg-white p-4 p-lg-5 d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge rounded-pill px-3 py-2" style="background-color: #fff0f0; color: #800000; border: 1px solid #ffcccc;">
+                            <span class="badge rounded-pill px-3 py-2" style="background-color: #fff0f0; color: #8b6262; border: 1px solid #ffcccc;">
                                 {{ $item->kategori }}
                             </span>
                             <div class="d-flex gap-2">
@@ -94,7 +94,7 @@
                         <div class="mb-4 p-3 rounded-4 shadow-sm" style="background-color: #fef9f9; border: 1px solid #fceaea;">
                             <div class="d-flex align-items-center">
                                 <div class="rounded-circle me-3 d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                                     style="width: 45px; height: 45px; background-color: #800000; font-size: 1rem;">
+                                     style="width: 45px; height: 45px; background-color: #8b6262; font-size: 1rem;">
                                     {{ strtoupper(substr($item->user->name, 0, 1)) }}
                                 </div>
                                 <div>
@@ -134,7 +134,7 @@
                                 </div>
                             @elseif($barterRequest && $barterRequest->status == 'accepted')
                                 <a href="{{ route('chat.show', $barterRequest->id) }}" class="btn text-white rounded-pill w-100 py-3 fw-bold shadow-sm transition-hover" 
-                                   style="background-color: #800000; font-size: 1.1rem;">
+                                   style="background-color: #8b6262; font-size: 1.1rem;">
                                     <i class="bi bi-chat-dots-fill me-2"></i> Lanjut ke Chat Negosiasi
                                 </a>
                             @elseif($barterRequest && $barterRequest->status == 'pending')
@@ -143,7 +143,7 @@
                                 </button>
                             @else
                                 <button type="button" class="btn text-white w-100 rounded-pill py-3 fw-bold shadow-sm btn-hover-effect" 
-                                        style="background-color: #800000; font-size: 1.1rem;"
+                                        style="background-color: #8b6262; font-size: 1.1rem;"
                                         data-bs-toggle="modal" data-bs-target="#offerBarterModal">
                                     <i class="bi bi-arrow-left-right me-2"></i> Ajukan Penawaran Barter
                                 </button>
@@ -164,7 +164,7 @@
             <form action="{{ route('barter.request.send', $item->id) }}" method="POST">
                 @csrf
                 <div class="modal-header border-0 p-4 bg-light">
-                    <h5 class="modal-title fw-bold" style="color: #800000; font-family: 'Playfair Display';">Pilih Barang Penukar</h5>
+                    <h5 class="modal-title fw-bold" style="color: #8b6262; font-family: 'Playfair Display';">Pilih Barang Penukar</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -196,7 +196,7 @@
                 </div>
 
                 <div class="modal-footer border-0 p-4 bg-light">
-                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold shadow-sm w-100" style="background-color: #800000;">
+                    <button type="submit" class="btn text-white rounded-pill px-5 fw-bold shadow-sm w-100" style="background-color: #8b6262;">
                         Kirim Penawaran Barter
                     </button>
                 </div>
@@ -212,7 +212,7 @@
         padding: 20px;
     }
     .thumb-box { border: 2px solid transparent; transition: 0.2s; }
-    .thumb-box.active { border-color: #800000; }
+    .thumb-box.active { border-color: #8b6262; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     
     .animate-fade-in { animation: fadeIn 0.5s ease; }
@@ -222,6 +222,6 @@
     .btn-hover-effect:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(128, 0, 0, 0.2) !important; transition: 0.3s; }
     
     .barter-option-card { border-color: transparent; transition: all 0.3s ease; }
-    .btn-check:checked + .barter-option-card { border-color: #800000 !important; background-color: #fff9f9; transform: scale(1.02); }
+    .btn-check:checked + .barter-option-card { border-color: #8b6262 !important; background-color: #fff9f9; transform: scale(1.02); }
 </style>
 @endsection

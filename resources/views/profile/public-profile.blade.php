@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container-fluid py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container-fluid py-5" style="min-height: 100vh;">
     <div class="container">
         
         {{-- HEADER PROFIL PUBLIK --}}
@@ -10,7 +10,7 @@
                 <div class="col-md-3 text-center">
                     {{-- Avatar dengan inisial --}}
                     <div class="rounded-circle shadow-sm mx-auto d-flex align-items-center justify-content-center" 
-                         style="width: 140px; height: 140px; background-color: #800000; border: 4px solid #fdf5f5;">
+                         style="width: 140px; height: 140px; background-color: #8b6262; border: 4px solid #fdf5f5;">
                         <span class="text-white fw-bold" style="font-size: 45px; font-family: 'Playfair Display', serif;">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </span>
@@ -20,7 +20,7 @@
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
                             <div class="d-flex align-items-center mb-1">
-                                <h1 class="h2 fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #800000;">{{ $user->name }}</h1>
+                                <h1 class="h2 fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #8b6262;">{{ $user->name }}</h1>
                                 @if($user->verification && $user->verification->status == 'verified')
                                     <span class="ms-2 badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill" style="font-size: 0.65rem;">
                                         <i class="bi bi-patch-check-fill me-1"></i> VERIFIED
@@ -31,7 +31,7 @@
                             
                             {{-- TAMPILAN LOKASI --}}
                             <div class="d-flex align-items-center text-secondary small mb-3">
-                                <i class="bi bi-geo-alt-fill me-1" style="color: #800000;"></i>
+                                <i class="bi bi-geo-alt-fill me-1" style="color: #8b6262;"></i>
                                 <span>{{ $user->district ?? 'Kecamatan' }}, {{ $user->city ?? 'Kota' }}</span>
                             </div>
                         </div>
@@ -51,8 +51,8 @@
 
         <div class="row mb-4">
             <div class="col">
-                <h3 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #800000;">Lemari Virtual {{ explode(' ', $user->name)[0] }}</h3>
-                <hr style="width: 50px; border: 2px solid #800000; opacity: 1;" class="mt-2">
+                <h3 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #8b6262;">Lemari Virtual {{ explode(' ', $user->name)[0] }}</h3>
+                <hr style="width: 50px; border: 2px solid #8b6262; opacity: 1;" class="mt-2">
             </div>
         </div>
 
@@ -135,7 +135,7 @@
     }
     
     /* Warna Maroon Konsisten */
-    .text-maroon { color: #800000 !important; }
+    .text-maroon { color: #8b6262 !important; }
     .bg-soft-maroon { background: #fff0f0; }
     
     /* Design Card Persis My Profile */

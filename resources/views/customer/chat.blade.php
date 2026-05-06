@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="container py-5" style="background-color: #fdf5f5; min-height: 100vh;">
+<div class="container py-5" style="min-height: 100vh;">
     <div class="row justify-content-center">
         <div class="col-md-9 col-lg-8">
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden chat-container">
@@ -54,7 +54,7 @@
                                     <div class="message-bubble shadow-sm p-3 {{ $msg->sender_id == Auth::id() ? 'bg-maroon text-white rounded-sent' : 'bg-white text-dark border rounded-received' }}" style="max-width: 80%;">
                                         
                                         @if($msg->sender_id != Auth::id())
-                                            <small class="d-block fw-bold mb-1" style="font-size: 0.65rem; color: #800000;">{{ $partner->name }}</small>
+                                            <small class="d-block fw-bold mb-1" style="font-size: 0.65rem; color: #8b6262;">{{ $partner->name }}</small>
                                         @endif
 
                                         {{-- TAMPILAN GAMBAR --}}
@@ -125,10 +125,10 @@
 
 {{-- CSS KHUSUS CHAT --}}
 <style>
-    .bg-maroon { background-color: #800000 !important; }
-    .text-maroon { color: #800000 !important; }
+    .bg-maroon { background-color: #8b6262 !important; }
+    .text-maroon { color: #8b6262 !important; }
     .bg-soft-maroon { background-color: #fff0f0; }
-    .btn-maroon { background-color: #800000; color: white; transition: 0.3s; }
+    .btn-maroon { background-color: #8b6262; color: white; transition: 0.3s; }
     .btn-maroon:hover { background-color: #600000; color: white; transform: scale(1.05); }
     .btn-maroon:disabled { opacity: 0.6; }
     
@@ -139,7 +139,7 @@
     .chat-img { transition: 0.3s; cursor: pointer; }
     .chat-img:hover { filter: brightness(0.9); }
     
-    .hover-maroon:hover { color: #800000 !important; }
+    .hover-maroon:hover { color: #8b6262 !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
 
     .animate-fade-in { animation: fadeIn 0.3s ease-out; }

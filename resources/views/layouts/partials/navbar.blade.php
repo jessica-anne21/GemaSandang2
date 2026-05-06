@@ -54,7 +54,7 @@
     }
 
     .nav-link:hover, .nav-link.active {
-        color: #800000 !important;
+        color: #8b6262 !important;
     }
 
     .nav-link::after {
@@ -64,7 +64,7 @@
         height: 2px;
         bottom: -2px;
         left: 50%;
-        background-color: #800000;
+        background-color: #8b6262;
         transition: all 0.3s ease;
         transform: translateX(-50%);
         opacity: 0;
@@ -98,7 +98,7 @@
 
     .dropdown-item:hover {
         background-color: #fdf5f5;
-        color: #800000;
+        color: #8b6262;
         transform: translateX(5px);
     }
 
@@ -112,7 +112,7 @@
     }
 
     .badge-custom {
-        background-color: #800000 !important;
+        background-color: #8b6262 !important;
         border: 2px solid #fff;
         font-size: 0.6rem;
         font-weight: bold;
@@ -121,7 +121,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="{{ url('/') }}" style="font-family: 'Playfair Display', serif; color: #800000; font-weight: bold;">
+        <a class="navbar-brand" href="{{ url('/') }}" style="font-family: 'Playfair Display', serif; color: #8b6262; font-weight: bold;">
             Gema Sandang
         </a>
 
@@ -175,8 +175,8 @@
                     {{-- PROFILE DROPDOWN DENGAN BADGE --}}
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center p-0 position-relative" href="#" id="navbarDropdown" data-bs-toggle="dropdown">
-                            <div class="rounded-circle bg-white d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 35px; height: 35px; border: 1.5px solid #800000;">
-                                <span class="fw-bold" style="color: #800000; font-size: 0.85rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                            <div class="rounded-circle bg-white d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 35px; height: 35px; border: 1.5px solid #8b6262;">
+                                <span class="fw-bold" style="color: #8b6262; font-size: 0.85rem;">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                             </div>
                             
                             {{-- BADGE BARTER DI INISIAL NAMA --}}

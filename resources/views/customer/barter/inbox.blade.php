@@ -13,18 +13,18 @@
                 {{-- TAMPILAN JIKA USER BELUM VERIFIED --}}
                 <div class="text-center py-5 mt-5 animate-fade-in">
                     <div class="mb-4">
-                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 120px; height: 120px; border: 3px dashed #800000; background-color: white;">
-                            <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #800000;"></i>
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 120px; height: 120px; border: 3px dashed #8b6262; background-color: white;">
+                            <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #8b6262;"></i>
                         </div>
                     </div>
                     <h2 class="fw-bold text-dark" style="font-family: 'Playfair Display';">Akses Terbatas</h2>
                     <p class="text-muted mx-auto" style="max-width: 500px;">Halaman riwayat barter hanya bisa diakses oleh user yang sudah terverifikasi identitasnya demi keamanan transaksi.</p>
-                    <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 py-3 fw-bold shadow" style="background-color: #800000;">Verifikasi KTP Sekarang</a>
+                    <a href="{{ route('verification.form') }}" class="btn text-white rounded-pill px-5 py-3 fw-bold shadow" style="background-color: #8b6262;">Verifikasi KTP Sekarang</a>
                 </div>
             @else
                 {{-- HEADER --}}
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold mb-0" style="font-family: 'Playfair Display'; color: #800000;">Riwayat Barter</h2>
+                    <h2 class="fw-bold mb-0" style="font-family: 'Playfair Display'; color: #8b6262;">Riwayat Barter</h2>
                 </div>
 
                 {{-- NAV TABS --}}
@@ -55,7 +55,7 @@
                                         elseif(in_array($req->status, ['accepted', 'on_going', 'completed'])) $borderColor = 'border-success';
                                         elseif(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc'])) $borderColor = 'border-danger';
 
-                                        if($req->status == 'rejected_qc') $statusLabel = 'GAGAL QC';
+                                        if($req->status == 'rejected_qc') $statusLabel = 'REJECTED QC';
                                     @endphp
 
                                     <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $borderColor }} {{ in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']) ? 'opacity-75' : '' }}">
@@ -66,7 +66,7 @@
                                                     <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-dark border border-light" style="font-size: 0.5rem;">Milikmu</span>
                                                 </div>
                                                 <i class="bi bi-arrow-left-right text-muted fs-5"></i>
-                                                <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #800000;">
+                                                <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #8b6262;">
                                                 <div class="ms-1">
                                                     <h6 class="mb-0 fw-bold text-dark">{{ $req->sender->name }}</h6>
                                                     <small class="text-muted d-block small">Barang Penawar: <strong>{{ $req->offeredItem->nama_barang ?? 'N/A' }}</strong></small>
@@ -91,22 +91,17 @@
                                                 <button class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold me-1" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $req->id }}">Detail</button>
                                                 
                                                 @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
-                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #800000;">Tracking</a>
+                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #8b6262;">Tracking</a>
                                                 @endif
                                             </div>
 
-                                            {{-- INFO ERROR / PENOLAKAN --}}
                                             @if(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']))
                                                 <div class="col-12 mt-2">
                                                     <div class="p-2 bg-light rounded-3 small text-danger fw-bold border-start border-danger border-3">
                                                         <i class="bi bi-info-circle me-2"></i>
-                                                        @if($req->status == 'rejected')
-                                                            Penawaran ditolak oleh Anda.
-                                                        @elseif($req->status == 'cancelled')
-                                                            Barter dibatalkan oleh partner.
-                                                        @elseif($req->status == 'rejected_qc')
-                                                            Dibatalkan oleh Admin (Gagal QC).
-                                                        @endif
+                                                        @if($req->status == 'rejected') Penawaran ditolak oleh Anda.
+                                                        @elseif($req->status == 'cancelled') Barter dibatalkan oleh partner.
+                                                        @elseif($req->status == 'rejected_qc') Dibatalkan oleh Admin (Gagal QC). @endif
                                                         <span class="text-muted fw-normal ms-1">({{ $req->cancel_reason ?? $req->admin_note ?? 'Tidak ada catatan tambahan' }})</span>
                                                     </div>
                                                 </div>
@@ -120,7 +115,7 @@
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
                                         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                                             <div class="modal-header border-0 bg-light p-4">
-                                                <h5 class="modal-title fw-bold" style="color: #800000; font-family: 'Playfair Display';">Review Penawaran</h5>
+                                                <h5 class="modal-title fw-bold" style="color: #8b6262; font-family: 'Playfair Display';">Review Penawaran</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body p-4 text-center">
@@ -131,7 +126,7 @@
                                                     </div>
                                                     <i class="bi bi-arrow-left-right fs-2 text-muted opacity-50"></i>
                                                     <div>
-                                                        <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-4 mb-2 shadow-sm" style="width: 140px; height: 140px; object-fit: cover; border: 3px solid #800000;">
+                                                        <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-4 mb-2 shadow-sm" style="width: 140px; height: 140px; object-fit: cover; border: 3px solid #8b6262;">
                                                         <p class="small fw-bold text-maroon mb-0 text-uppercase" style="font-size: 0.65rem;">Barang Penawar</p>
                                                     </div>
                                                 </div>
@@ -148,13 +143,32 @@
                                                         </ul>
                                                     </div>
                                                 </div>
+
                                                 @if($req->status == 'pending')
-                                                    <div class="d-flex gap-2 pt-3 border-top">
-                                                        <form action="{{ route('barter.reject', $req->id) }}" method="POST" class="flex-grow-1">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-outline-danger rounded-pill w-100 fw-bold" onclick="return confirm('Yakin ingin menolak penawaran ini?')">Tolak Penawaran</button>
-                                                        </form>
-                                                        <button onclick="kirimOtp({{ $req->id }})" class="btn text-white flex-grow-1 rounded-pill fw-bold btn-accept-{{ $req->id }}" style="background-color: #800000;">Terima & Verifikasi</button>
+                                                    <div class="pt-3 border-top">
+                                                        {{-- BAGIAN INPUT OTP (Awalnya Sembunyi) --}}
+                                                        <div id="otp-section-{{ $req->id }}" style="display: none;" class="animate-fade-in">
+                                                            <div class="p-3 rounded-4 bg-soft-maroon mb-3">
+                                                                <label class="fw-bold text-maroon d-block mb-2">Masukkan Kode OTP</label>
+                                                                <p class="x-small text-muted mb-3">Kode 6 digit telah dikirim ke email kamu.</p>
+                                                                <form action="{{ route('barter.accept', $req->id) }}" method="POST">
+                                                                    @csrf
+                                                                    <div class="d-flex justify-content-center gap-2 mb-3">
+                                                                        <input type="text" name="otp_code" class="form-control text-center fw-bold fs-4 rounded-3" style="letter-spacing: 10px;" maxlength="6" required placeholder="000000">
+                                                                    </div>
+                                                                    <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">Verifikasi & Terima Barter</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- TOMBOL AKSI AWAL --}}
+                                                        <div class="d-flex gap-2">
+                                                            <form action="{{ route('barter.reject', $req->id) }}" method="POST" class="flex-grow-1">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-outline-danger rounded-pill w-100 fw-bold" onclick="return confirm('Yakin ingin menolak penawaran ini?')">Tolak Penawaran</button>
+                                                            </form>
+                                                            <button onclick="kirimOtp({{ $req->id }})" class="btn text-white flex-grow-1 rounded-pill fw-bold btn-accept-{{ $req->id }}" style="background-color: #8b6262;">Terima & Verifikasi</button>
+                                                        </div>
                                                     </div>
                                                 @endif
                                             </div>
@@ -180,14 +194,13 @@
                                         $sentLabel = strtoupper($req->status);
                                         if(in_array($req->status, ['accepted', 'on_going', 'completed'])) $sentBorder = 'border-success';
                                         elseif(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc'])) $sentBorder = 'border-danger';
-                                        
                                         if($req->status == 'rejected_qc') $sentLabel = 'GAGAL QC';
                                     @endphp
 
                                     <div class="card border-0 shadow-sm rounded-4 p-3 border-start border-4 {{ $sentBorder }} {{ in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']) ? 'opacity-75' : '' }}">
                                         <div class="row align-items-center">
                                             <div class="col-md-5 d-flex align-items-center gap-3">
-                                                <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #800000;">
+                                                <img src="{{ asset('storage/' . ($req->offeredItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid #8b6262;">
                                                 <i class="bi bi-arrow-right text-muted fs-5"></i>
                                                 <img src="{{ asset('storage/' . ($req->requestedItem->foto_barang ?? 'default.jpg')) }}" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
                                                 <div class="ms-1">
@@ -204,30 +217,11 @@
                                                        class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold me-1">
                                                         <i class="bi bi-chat-dots me-1"></i> Chat
                                                     </a>
-                                                @endif
-
-                                                @if(in_array($req->status, ['accepted', 'on_going', 'completed', 'rejected_qc']))
-                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-outline-dark btn-sm rounded-pill px-4 fw-bold shadow-sm">Tracking</a>
+                                                    <a href="{{ route('barter.tracking', $req->id) }}" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm" style="background-color: #8b6262;">Tracking</a>
                                                 @elseif($req->status == 'pending')
                                                     <span class="small text-muted italic">Menunggu respon partner...</span>
                                                 @endif
                                             </div>
-
-                                            @if(in_array($req->status, ['rejected', 'cancelled', 'rejected_qc']))
-                                                <div class="col-12 mt-2">
-                                                    <div class="p-2 bg-light rounded-3 small text-danger fw-bold border-start border-danger border-3">
-                                                        <i class="bi bi-info-circle me-1"></i>
-                                                        @if($req->status == 'rejected')
-                                                            Penawaran ditolak oleh partner.
-                                                        @elseif($req->status == 'cancelled')
-                                                            Barter dibatalkan oleh partner.
-                                                        @elseif($req->status == 'rejected_qc')
-                                                            Dibatalkan oleh Admin (Gagal QC).
-                                                        @endif
-                                                        <span class="text-muted fw-normal ms-1">({{ $req->cancel_reason ?? $req->admin_note ?? 'Tidak ada catatan tambahan' }})</span>
-                                                    </div>
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -262,35 +256,30 @@
         .then(response => response.json())
         .then(data => {
             if(data.success) { 
+                // MUNCULIN BAGIAN OTP NYA JES!
                 document.getElementById(`otp-section-${id}`).style.display = 'block'; 
-                btn.style.display = 'none'; 
+                btn.parentElement.style.display = 'none'; // Sembunyiin tombol tawar/terima
             } else {
                 alert('Gagal mengirim OTP: ' + (data.message || 'Coba lagi.'));
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
+        })
+        .catch(error => {
+            alert('Terjadi kesalahan koneksi.');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         });
     }
 </script>
 
 <style>
-    .nav-pills .nav-link.active { 
-        background-color: #800000 !important; 
-        color: white !important; 
-        border-color: #800000 !important;
-    }
-    .nav-pills .nav-link { 
-        color: #800000; 
-        border: 1px solid #800000; 
-        transition: 0.3s; 
-        background-color: white;
-    }
-    .nav-pills .nav-link:hover { 
-        background-color: #fff0f0; 
-        color: #800000;
-    }
+    .nav-pills .nav-link.active { background-color: #8b6262 !important; color: white !important; border-color: #8b6262 !important; }
+    .nav-pills .nav-link { color: #8b6262; border: 1px solid #8b6262; transition: 0.3s; background-color: white; }
+    .nav-pills .nav-link:hover { background-color: #fff0f0; color: #7a5555; }
     .bg-soft-maroon { background-color: #fff0f0; }
-    .text-maroon { color: #800000 !important; }
+    .text-maroon { color: #8b6262 !important; }
+    .x-small { font-size: 0.7rem; }
     .italic { font-style: italic; }
     .animate-fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

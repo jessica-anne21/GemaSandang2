@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container my-5">
-    <h3 class="mb-4" style="font-family: 'Playfair Display', serif;">
+    <h3 class="mb-4" style="font-family: 'Playfair Display', serif; color: #8b6262;">
         Riwayat Pesanan Saya
     </h3>
 
