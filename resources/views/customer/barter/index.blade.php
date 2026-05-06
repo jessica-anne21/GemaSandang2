@@ -82,7 +82,7 @@
                                         </div>
                                         <div class="text-muted d-flex align-items-center" style="font-size: 0.7rem;">
                                             <i class="bi bi-geo-alt-fill me-1 text-danger"></i>
-                                            <span class="text-truncate">{{ $item->user->city ?? 'Bandung' }}</span>
+                                            <span class="text-truncate">{{ $item->user->city ?? '-' }}</span>
                                         </div>
                                     </div>
                                 </div>

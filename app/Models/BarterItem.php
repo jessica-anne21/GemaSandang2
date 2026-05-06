@@ -17,7 +17,9 @@ class BarterItem extends Model
         'deskripsi',    
         'kondisi',      
         'foto_barang',  
+        'foto_lainnya',
         'kategori',     
+        'size',
         'status',       
     ];
 
@@ -30,4 +32,16 @@ class BarterItem extends Model
     {
         return $query->where('status', 'available');
     }
+
+    // Barang ini diposisikan sebagai barang yang DIMINTA orang lain
+public function barterRequestsAsRequested()
+{
+    return $this->hasMany(BarterRequest::class, 'requested_item_id');
+}
+
+// Barang ini diposisikan sebagai barang PENUKAR yang ditawarkan
+public function barterRequestsAsOffered()
+{
+    return $this->hasMany(BarterRequest::class, 'offered_item_id');
+}
 }

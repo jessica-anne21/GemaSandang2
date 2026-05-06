@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\TrendController as AdminTrendController;
 use App\Http\Controllers\Admin\AdminBargainController;
+use App\Http\Controllers\Admin\AdminBarterController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\Customer\BarterItemController;
 
@@ -52,6 +53,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('view-ktp/{filename}', [VerificationController::class, 'showKtp'])->name('view-ktp');
         Route::post('verifications/approve/{id}', [VerificationController::class, 'approve'])->name('verify.approve');
         Route::post('verifications/reject/{id}', [VerificationController::class, 'reject'])->name('verify.reject');
+
+        Route::get('/barters', [AdminBarterController::class, 'index'])->name('barter.index');
+
+        Route::post('/barters/verify-payment/{id}/{userType}', [AdminBarterController::class, 'verifyPayment'])->name('barter.verify-payment');
+        Route::post('/barters/reject-payment/{id}/{userType}', [AdminBarterController::class, 'rejectPayment'])->name('barter.reject-payment');
+        Route::get('/barters/{id}', [AdminBarterController::class, 'show'])->name('barter.show');
+        Route::post('/barters/update-logistic/{id}/{userType}', [AdminBarterController::class, 'updateLogistic'])->name('barter.update-logistic');
     });
 });
 
@@ -103,6 +111,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/barter/item/{id}', [BarterController::class, 'update'])->name('barter.update');
     Route::post('/barter/send-otp/{id?}', [BarterController::class, 'sendOtp'])->name('barter.send-otp');
     Route::post('/barter/verify-otp/{id}', [BarterController::class, 'verifyAcceptance'])->name('barter.verify-otp');
+    Route::get('/barter/tracking/{id}', [BarterController::class, 'tracking'])->name('barter.tracking');
+    Route::post('/barter/select-protection/{id}', [BarterController::class, 'selectProtection'])->name('barter.select-protection');
+    Route::post('/barter/reject/{id}', [BarterController::class, 'rejectRequest'])->name('barter.reject');
+    Route::post('/barter/complete/{id}', [BarterController::class, 'completeBarter'])->name('barter.complete');
+    Route::post('/barter/upload-payment/{id}', [BarterController::class, 'uploadPayment'])->name('barter.upload-payment');
+    Route::post('/barter/cancel/{id}', [BarterController::class, 'cancel'])->name('barter.cancel');
+
 
     Route::get('/my-profile', [ProfileController::class, 'index'])->name('profile.my-profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -111,7 +126,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/verify-identity', [ProfileController::class, 'showVerificationForm'])->name('verification.form');
     Route::post('/verify-identity', [ProfileController::class, 'submitVerification'])->name('verification.submit');
     Route::get('/profile/{id}', [ProfileController::class, 'showPublicProfile'])->name('profile.public');
-    Route::post('/my-closet/add', [BarterItemController::class, 'store'])->name('barter.store');
+    Route::post('/my-closet/add', [BarterItemController::class, 'store'])->name('items.store');
+    Route::delete('/my-closet/item/{id}', [BarterItemController::class, 'destroy'])->name('items.destroy');
+    Route::patch('/my-closet/item/{id}', [BarterItemController::class, 'update'])->name('items.update');
 });
 
 require __DIR__.'/auth.php';
