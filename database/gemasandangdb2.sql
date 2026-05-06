@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Apr 26, 2026 at 07:52 PM
+-- Generation Time: May 06, 2026 at 10:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,13 +64,76 @@ CREATE TABLE `barter_items` (
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `nama_barang` varchar(255) NOT NULL,
   `deskripsi` text NOT NULL,
-  `kategori` enum('Outer','Dress','Atasan','Celana','Aksesoris') NOT NULL,
+  `kategori` varchar(255) NOT NULL,
+  `size` varchar(10) DEFAULT NULL,
   `kondisi` varchar(100) NOT NULL,
   `foto_barang` varchar(255) NOT NULL,
-  `status` enum('available','traded','hidden') DEFAULT 'available',
+  `foto_lainnya` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`foto_lainnya`)),
+  `status` enum('available','traded','pending') DEFAULT 'available',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `barter_items`
+--
+
+INSERT INTO `barter_items` (`id`, `user_id`, `nama_barang`, `deskripsi`, `kategori`, `size`, `kondisi`, `foto_barang`, `foto_lainnya`, `status`, `created_at`, `updated_at`) VALUES
+(1, 5, 'Rok Floral', 'Pemakaian baru 1 kali.', 'Bawahan', NULL, 'Like New', 'barter_items/1poNr7riB8VMsGCOcPtP2WZsJlRN2wrhEb4RIccl.jpg', NULL, 'traded', '2026-04-26 18:19:39', '2026-05-05 17:24:32'),
+(2, 6, 'Pink Tanktop Coquette', 'Sudah sekitar 5 kali dipakai. Siap barter!', 'Atasan', NULL, 'Good Condition', 'barter_items/7y4ctfYoNXSOPBX4DNuHH4Q7tN6UO5HnjF5Oj6vY.jpg', NULL, 'traded', '2026-04-26 18:41:14', '2026-05-05 17:24:32'),
+(3, 6, 'Cardigan Floral Biru', 'Cardigan vintage masih layak pakai baru pernah dipakai 2x. Siap dibarter karena mau pindah ke area yang panas sehingga tidak membutuhkan cardigan lagi.', 'Atasan', NULL, 'Like New', 'barter_items/WcXHAkoAiS7SAdVwev9Lij2Cfi7shdhwjuwXVzAv.jpg', NULL, 'available', '2026-04-28 09:40:02', '2026-05-06 08:05:58'),
+(4, 7, 'Dress Biru Tua', 'Belum pernah dipakai. Dulu beli untuk istri tapi ternyata tidak cukup. Bersedia barter dengan atasan/outer oversize', 'Dress', NULL, 'Like New', 'barter_items/eV9G8WAyUjKq85t2nGPQ6yZ3kpLhWYoexknUDW6F.jpg', NULL, 'traded', '2026-04-28 16:29:31', '2026-05-05 19:15:47'),
+(6, 6, 'Rok Floral', 'Rok sudah tidak terpakai', 'Bawahan', NULL, 'Like New', 'barter_items/5vna8I5kKDJM8eeVHNNYxujYJr2862dHLMLW7DFB.jpg', '[\"barter_items\\/4nSSylMgPloaLmUlBMX5Gvk0eGkf1BlXlj7YARrt.png\",\"barter_items\\/dRW82Y8GnjQb4Wy6KjHPJGCdMBkkrKfB8TFpLdmS.png\",\"barter_items\\/lTXiNff9udP75eGlVfKpto5uDtb7KVSnlJZbLYld.png\",\"barter_items\\/dYj2CRzIpzDi4suvbA8Po5XHURd2i6AmQmMRLp3F.png\"]', 'traded', '2026-05-04 10:24:32', '2026-05-05 19:15:47'),
+(8, 6, 'Gingham Plaid Top', 'Sudah bosan dipakai', 'Atasan', 'S', 'Like New', 'barter_items/XyX2SjuFHunP58s5vLE6GtkZsEFRtRRTXPv2YUdW.jpg', '[\"barter_items\\/ynwv9b2sIiSITYnMtVDGFFHRIPUI83cvBMLlChJK.png\",\"barter_items\\/higOqF8BTbZq2LxHcIrjpgw7D1ZX1ueOApGl1gJk.png\"]', 'available', '2026-05-05 18:43:46', '2026-05-05 18:43:46'),
+(9, 7, 'Rose Mini Dress', 'Sudah dipakai sekitar 10x. Sudah tidak muat di badan saya, siap barter dengan baju ukuran M', 'Dress', 'XS', 'Good Condition', 'barter_items/8OGUdjlkNAesf0sVy1hM7IwVdGD9DD6PKcGof2TV.jpg', '[]', 'available', '2026-05-05 19:25:33', '2026-05-06 08:05:58');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `barter_requests`
+--
+
+CREATE TABLE `barter_requests` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `sender_id` bigint(20) UNSIGNED NOT NULL,
+  `receiver_id` bigint(20) UNSIGNED NOT NULL,
+  `requested_item_id` bigint(20) UNSIGNED NOT NULL,
+  `offered_item_id` bigint(20) UNSIGNED NOT NULL,
+  `message` text DEFAULT NULL,
+  `sender_resi` varchar(50) DEFAULT NULL,
+  `receiver_resi` varchar(50) DEFAULT NULL,
+  `status` enum('pending','accepted','rejected','completed','cancelled','on_going') DEFAULT 'pending',
+  `cancel_reason` varchar(255) DEFAULT NULL,
+  `cancelled_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `otp_code` varchar(6) DEFAULT NULL,
+  `method_selection` enum('none','standard','protection') DEFAULT 'none',
+  `sender_payment_proof` varchar(255) DEFAULT NULL,
+  `receiver_payment_proof` varchar(255) DEFAULT NULL,
+  `sender_payment_status` enum('waiting','paid') DEFAULT 'waiting',
+  `receiver_payment_status` enum('waiting','paid') DEFAULT 'waiting',
+  `sender_received_at` timestamp NULL DEFAULT NULL,
+  `receiver_received_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `terms_accepted` tinyint(1) DEFAULT 0,
+  `sender_logistic_status` enum('pending','at_warehouse','qc_process','shipped_to_receiver') DEFAULT 'pending',
+  `receiver_logistic_status` enum('pending','at_warehouse','qc_process','shipped_to_sender') DEFAULT 'pending',
+  `resi_from_admin_to_sender` varchar(100) DEFAULT NULL,
+  `resi_from_admin_to_receiver` varchar(100) DEFAULT NULL,
+  `sender_confirmed_at` timestamp NULL DEFAULT NULL,
+  `receiver_confirmed_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `barter_requests`
+--
+
+INSERT INTO `barter_requests` (`id`, `sender_id`, `receiver_id`, `requested_item_id`, `offered_item_id`, `message`, `sender_resi`, `receiver_resi`, `status`, `cancel_reason`, `cancelled_by`, `otp_code`, `method_selection`, `sender_payment_proof`, `receiver_payment_proof`, `sender_payment_status`, `receiver_payment_status`, `sender_received_at`, `receiver_received_at`, `created_at`, `updated_at`, `terms_accepted`, `sender_logistic_status`, `receiver_logistic_status`, `resi_from_admin_to_sender`, `resi_from_admin_to_receiver`, `sender_confirmed_at`, `receiver_confirmed_at`) VALUES
+(11, 6, 5, 1, 2, NULL, '1234567', '31315235', 'completed', NULL, NULL, NULL, 'protection', 'payment_proofs/hPfasHGnrFrAodnKIFVaSSa27BGDMzD6iFPDoMyS.png', 'payment_proofs/UcLAqS7wlmr6budkSXaVkEkuvs7uaQr4p2GqF0mv.png', 'paid', 'paid', NULL, NULL, '2026-05-04 12:05:53', '2026-05-05 17:17:51', 1, 'shipped_to_receiver', 'shipped_to_sender', '1213124153351', '5352363263', NULL, NULL),
+(12, 6, 7, 4, 6, NULL, '31315235', '1234567', 'completed', NULL, NULL, NULL, 'standard', NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-04 12:16:49', '2026-05-05 19:15:47', 1, 'pending', 'pending', NULL, NULL, '2026-05-05 19:15:26', '2026-05-05 19:15:47'),
+(13, 7, 6, 8, 9, NULL, NULL, NULL, 'rejected', NULL, NULL, NULL, 'none', NULL, NULL, 'waiting', 'waiting', NULL, NULL, '2026-05-05 19:25:56', '2026-05-05 19:28:27', 0, 'pending', 'pending', NULL, NULL, NULL, NULL),
+(14, 6, 7, 9, 3, NULL, NULL, NULL, 'rejected', NULL, NULL, NULL, 'none', NULL, NULL, 'waiting', 'waiting', NULL, NULL, '2026-05-05 19:34:20', '2026-05-05 19:39:34', 0, 'pending', 'pending', NULL, NULL, NULL, NULL),
+(15, 7, 6, 3, 9, NULL, NULL, NULL, 'cancelled', NULL, NULL, NULL, 'standard', NULL, NULL, NULL, NULL, NULL, NULL, '2026-05-05 19:40:12', '2026-05-06 08:05:58', 1, 'pending', 'pending', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -239,52 +302,13 @@ CREATE TABLE `messages` (
   `id` int(11) NOT NULL,
   `sender_id` bigint(20) UNSIGNED NOT NULL,
   `receiver_id` bigint(20) UNSIGNED NOT NULL,
+  `barter_request_id` bigint(20) UNSIGNED DEFAULT NULL,
   `isi_pesan` text NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `messages`
---
-
-INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `isi_pesan`, `created_at`, `updated_at`) VALUES
-(1, 2, 4, 'hai', '2026-03-28 15:10:44', '2026-03-28 15:10:44'),
-(2, 4, 2, 'halo juga', '2026-03-28 15:11:17', '2026-03-28 15:11:17'),
-(3, 4, 2, 'lagi apa', '2026-03-28 15:15:39', '2026-03-28 15:15:39'),
-(4, 4, 2, 'test', '2026-03-28 15:17:58', '2026-03-28 15:17:58'),
-(5, 2, 4, 'test', '2026-03-28 15:18:03', '2026-03-28 15:18:03'),
-(6, 4, 2, 'test', '2026-03-28 15:21:39', '2026-03-28 15:21:39'),
-(7, 4, 2, 'hai', '2026-03-28 15:23:20', '2026-03-28 15:23:20'),
-(8, 2, 4, 'halo', '2026-03-28 15:23:28', '2026-03-28 15:23:28'),
-(9, 2, 4, 'test', '2026-03-28 15:23:44', '2026-03-28 15:23:44'),
-(10, 2, 4, '1', '2026-03-28 15:25:30', '2026-03-28 15:25:30'),
-(11, 2, 4, 'hai', '2026-03-28 15:27:04', '2026-03-28 15:27:04'),
-(12, 2, 4, 'hai', '2026-03-28 15:28:41', '2026-03-28 15:28:41'),
-(13, 2, 4, 'testtest', '2026-03-28 15:28:53', '2026-03-28 15:28:53'),
-(14, 4, 2, 'hai', '2026-03-28 15:30:19', '2026-03-28 15:30:19'),
-(15, 4, 2, 'OMAIGATTT', '2026-03-28 15:30:25', '2026-03-28 15:30:25'),
-(16, 2, 4, 'yasssss', '2026-03-28 15:30:29', '2026-03-28 15:30:29'),
-(17, 4, 2, 'hai', '2026-03-28 15:30:42', '2026-03-28 15:30:42'),
-(18, 2, 4, 'hai juga', '2026-03-28 15:30:47', '2026-03-28 15:30:47'),
-(19, 2, 4, 'test lagi', '2026-03-28 15:33:24', '2026-03-28 15:33:24'),
-(20, 4, 2, 'test', '2026-03-28 15:33:29', '2026-03-28 15:33:29'),
-(21, 2, 4, 'haiiiii', '2026-03-28 15:34:54', '2026-03-28 15:34:54'),
-(22, 4, 2, 'hai', '2026-03-28 15:34:59', '2026-03-28 15:34:59'),
-(23, 2, 4, 'hola', '2026-03-28 15:38:10', '2026-03-28 15:38:10'),
-(24, 4, 2, 'holaaa', '2026-03-28 15:38:13', '2026-03-28 15:38:13'),
-(25, 2, 4, 'holaaa', '2026-03-28 15:38:16', '2026-03-28 15:38:16'),
-(26, 4, 2, 'omaigatt', '2026-03-28 15:38:57', '2026-03-28 15:38:57'),
-(27, 4, 2, 'hai', '2026-04-16 07:22:06', '2026-04-16 07:22:06'),
-(28, 4, 2, 'hai', '2026-04-16 07:22:10', '2026-04-16 07:22:10'),
-(29, 4, 2, 'hai', '2026-04-16 07:22:13', '2026-04-16 07:22:13'),
-(30, 4, 2, 'hai', '2026-04-16 07:22:15', '2026-04-16 07:22:15'),
-(31, 4, 2, 'hai', '2026-04-16 07:22:37', '2026-04-16 07:22:37'),
-(32, 4, 2, 'test', '2026-04-16 07:22:43', '2026-04-16 07:22:43'),
-(33, 2, 4, 'woy', '2026-04-16 07:24:04', '2026-04-16 07:24:04'),
-(34, 4, 2, 'lagi apa', '2026-04-16 07:24:10', '2026-04-16 07:24:10'),
-(35, 4, 2, 'lagi apa', '2026-04-16 07:24:10', '2026-04-16 07:24:10'),
-(36, 2, 4, 'ngopi', '2026-04-16 07:24:13', '2026-04-16 07:24:13');
 
 -- --------------------------------------------------------
 
@@ -455,8 +479,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('airfybRXuOL61lTdp93f1kezEX7l1TNRkPgBRYQN', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiU0NUTGxyNkYyd2RkM2NUZUJMUWx4Y08zZWNMTmN6a3FLWWRlRWZuYyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9sb2dpbiI7fX0=', 1776667424),
-('QioTY3hZebK9qRgkM0WhkoicKRuV39RXEB3A4MUe', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiN20wamNFVUgzRHBLQnBEYlFZTjkwYjdEUXcyMktjdEJLVDZMc2tyWiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6MzoidXJsIjthOjE6e3M6ODoiaW50ZW5kZWQiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wcm9maWxlLzQiO319', 1776667418);
+('4vRXX2iAoBUKvGuakqSKqcaPxlSLzKb7p37YqRgm', 7, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoieEozV1dmWVNFZ2t4d3d6Nk5Tajl0SVpHdXl6QjRLQ0JNT1BRYVRtRCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yaXdheWF0LWJhcnRlciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjc7fQ==', 1778054770),
+('xrIINJ4QF3ILrU2ymux13H8TMsHqpSM29Ein5WQ7', 6, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiSE12SnNzTXhCVWNNRXJqcm1RckRsNzBtNlVEdHFJcGlISXlGSk00NiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yaXdheWF0LWJhcnRlciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjY7fQ==', 1778054759);
 
 -- --------------------------------------------------------
 
@@ -528,6 +552,8 @@ CREATE TABLE `users` (
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `alamat` text DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `district` varchar(100) DEFAULT NULL,
   `nomor_hp` varchar(255) DEFAULT NULL,
   `role` enum('admin','customer') NOT NULL DEFAULT 'customer',
   `remember_token` varchar(100) DEFAULT NULL,
@@ -539,15 +565,15 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `bio`, `email`, `email_verified_at`, `password`, `alamat`, `nomor_hp`, `role`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Jessica Anne', NULL, NULL, 'jesshar2108@gmail.com', NULL, '$2y$12$BUdJ3qPPaMdATQcJw2R97ORyQO2dphz/pmGCpFXhJMnw/Octe69o6', 'Jl Pakar Timur', '082121349200', 'customer', NULL, '2025-10-16 01:45:14', '2026-01-01 12:35:04'),
-(2, 'Jonathan', NULL, NULL, 'jonathan@gmail.com', NULL, '$2y$12$gDcEJGQLWVfv/wCcuksSGuY1uQMmRdtRWD7f7fG7RTdJKjbmEnwsO', 'Jl Dago', '0812345678', 'customer', NULL, '2025-10-16 17:49:01', '2025-12-28 09:47:06'),
-(3, 'Admin', NULL, NULL, 'admin1@gmail.com', NULL, '$2y$12$AzvKjT2F8gUIKlVTISXUlOl00rAHOq14ov3UWOrKkeKjYdxmyfvIK', NULL, NULL, 'admin', NULL, '2025-10-21 02:31:01', '2025-10-21 02:31:01'),
-(4, 'Anne', 'anne21', NULL, 'anne@gmail.com', NULL, '$2y$12$2fot7KE8dMna1o7nPkup6.bsTliSyXjQRpFHTZooUEkI0U1aLvIXK', 'Dago', '0812345678', 'customer', NULL, '2025-12-14 22:51:54', '2025-12-28 11:16:23'),
-(5, 'Darmawan', 'darmawan19', 'I love fashion', 'darmawan@gmail.com', NULL, '$2y$12$vNw7DrkgwCPaQOPzZmAfoux1ELPNH6nz2wgcGeHLcXetOYZKWp/Z2', NULL, NULL, 'customer', NULL, '2026-04-18 12:13:41', '2026-04-19 09:26:07'),
-(6, 'Ida', 'ida24', NULL, 'ida@gmail.com', NULL, '$2y$12$UhtwJ032LD3P0oTd.bUwEOm/eVYQXHWJaXaCjp9YJspqb5/1VUDwi', NULL, NULL, 'customer', NULL, '2026-04-19 16:55:01', '2026-04-19 16:55:01'),
-(7, 'Ujang', 'ujangiskandar', NULL, 'ujang@gmail.com', NULL, '$2y$12$Qq8gK7pVdDdejz7RXEGpXua72QG9pQVz5Zz2NabnzaC1TTf6oakM2', NULL, NULL, 'customer', NULL, '2026-04-19 18:17:06', '2026-04-19 18:17:06'),
-(8, 'asep', 'asep', NULL, 'asep@gmail.com', NULL, '$2y$12$/g3ORgCUU1LhgzRFhJq7xeZ8MmMn9apJbBxxH5Du3lKxNbXyBL7W.', NULL, NULL, 'customer', NULL, '2026-04-20 06:01:52', '2026-04-20 06:01:52');
+INSERT INTO `users` (`id`, `name`, `username`, `bio`, `email`, `email_verified_at`, `password`, `alamat`, `city`, `district`, `nomor_hp`, `role`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 'Jessica Anne', NULL, NULL, 'jesshar2108@gmail.com', NULL, '$2y$12$BUdJ3qPPaMdATQcJw2R97ORyQO2dphz/pmGCpFXhJMnw/Octe69o6', 'Jl Pakar Timur', NULL, NULL, '082121349200', 'customer', NULL, '2025-10-16 01:45:14', '2026-01-01 12:35:04'),
+(2, 'Jonathan', NULL, NULL, 'jonathan@gmail.com', NULL, '$2y$12$gDcEJGQLWVfv/wCcuksSGuY1uQMmRdtRWD7f7fG7RTdJKjbmEnwsO', 'Jl Dago', NULL, NULL, '0812345678', 'customer', NULL, '2025-10-16 17:49:01', '2025-12-28 09:47:06'),
+(3, 'Admin', NULL, NULL, 'admin1@gmail.com', NULL, '$2y$12$AzvKjT2F8gUIKlVTISXUlOl00rAHOq14ov3UWOrKkeKjYdxmyfvIK', NULL, NULL, NULL, NULL, 'admin', NULL, '2025-10-21 02:31:01', '2025-10-21 02:31:01'),
+(4, 'Anne', 'anne21', NULL, 'anne@gmail.com', NULL, '$2y$12$2fot7KE8dMna1o7nPkup6.bsTliSyXjQRpFHTZooUEkI0U1aLvIXK', 'Dago', NULL, NULL, '0812345678', 'customer', NULL, '2025-12-14 22:51:54', '2025-12-28 11:16:23'),
+(5, 'Darmawan', 'darmawan19', 'I love fashion', 'darmawan@gmail.com', NULL, '$2y$12$vNw7DrkgwCPaQOPzZmAfoux1ELPNH6nz2wgcGeHLcXetOYZKWp/Z2', NULL, NULL, NULL, NULL, 'customer', NULL, '2026-04-18 12:13:41', '2026-04-19 09:26:07'),
+(6, 'Ida', 'ida24', NULL, 'ida@gmail.com', NULL, '$2y$12$UhtwJ032LD3P0oTd.bUwEOm/eVYQXHWJaXaCjp9YJspqb5/1VUDwi', 'Jl. Coblong No. 30A, Bandung 40198', 'Bandung', 'Coblong', '0812345910', 'customer', NULL, '2026-04-19 16:55:01', '2026-05-05 18:54:33'),
+(7, 'Ujang', 'ujangiskandar', NULL, 'ujang@gmail.com', NULL, '$2y$12$Qq8gK7pVdDdejz7RXEGpXua72QG9pQVz5Zz2NabnzaC1TTf6oakM2', NULL, NULL, NULL, NULL, 'customer', NULL, '2026-04-19 18:17:06', '2026-04-19 18:17:06'),
+(8, 'asep', 'asep', NULL, 'asep@gmail.com', NULL, '$2y$12$/g3ORgCUU1LhgzRFhJq7xeZ8MmMn9apJbBxxH5Du3lKxNbXyBL7W.', NULL, 'Bandung', 'Coblong', NULL, 'customer', NULL, '2026-04-20 06:01:52', '2026-05-02 18:09:32');
 
 -- --------------------------------------------------------
 
@@ -560,7 +586,9 @@ CREATE TABLE `user_verifications` (
   `user_id` bigint(20) UNSIGNED NOT NULL,
   `nik` varchar(16) NOT NULL,
   `ktp_path` varchar(255) NOT NULL,
+  `selfie_path` varchar(255) DEFAULT NULL,
   `status` enum('pending','verified','rejected') NOT NULL DEFAULT 'pending',
+  `verified_at` timestamp NULL DEFAULT NULL,
   `rejection_reason` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -570,10 +598,11 @@ CREATE TABLE `user_verifications` (
 -- Dumping data for table `user_verifications`
 --
 
-INSERT INTO `user_verifications` (`id`, `user_id`, `nik`, `ktp_path`, `status`, `rejection_reason`, `created_at`, `updated_at`) VALUES
-(1, 5, '1234567890123451', 'id_cards/yceuRtWyfYYBs8znOclKNUAYp6f3uqqyNlhRfWBf.jpg', 'verified', NULL, '2026-04-18 12:13:42', '2026-04-19 16:43:01'),
-(2, 6, '1234567890123423', 'id_cards/JGQp5IEw7ibjEp47CzQLVF59jz2BzLehrh2KiRVp.png', 'verified', NULL, '2026-04-19 16:56:05', '2026-04-19 16:56:52'),
-(3, 7, '1234567890123421', 'id_cards/NiOyIInLCCBAJP0Q9cH6ONAXa3QY1GE1mJZ2C5fq.png', 'verified', NULL, '2026-04-19 18:17:42', '2026-04-19 18:32:02');
+INSERT INTO `user_verifications` (`id`, `user_id`, `nik`, `ktp_path`, `selfie_path`, `status`, `verified_at`, `rejection_reason`, `created_at`, `updated_at`) VALUES
+(1, 5, '1234567890123451', 'id_cards/yceuRtWyfYYBs8znOclKNUAYp6f3uqqyNlhRfWBf.jpg', NULL, 'verified', NULL, NULL, '2026-04-18 12:13:42', '2026-04-19 16:43:01'),
+(2, 6, '1234567890123423', 'id_cards/JGQp5IEw7ibjEp47CzQLVF59jz2BzLehrh2KiRVp.png', NULL, 'verified', NULL, NULL, '2026-04-19 16:56:05', '2026-04-19 16:56:52'),
+(3, 7, '1234567890123421', 'id_cards/NiOyIInLCCBAJP0Q9cH6ONAXa3QY1GE1mJZ2C5fq.png', NULL, 'verified', NULL, NULL, '2026-04-19 18:17:42', '2026-04-19 18:32:02'),
+(5, 8, '3213242834932849', 'id_cards/nOrDags8lRzQEcEAI17iQUqL4ZaUUDnuML7fBvm8.png', 'selfies/nPW1LM1Jbd9gTNiQexHgRISD6rJ35AoF8jQZTtGP.png', 'pending', NULL, NULL, '2026-05-02 17:01:50', '2026-05-02 17:41:50');
 
 --
 -- Indexes for dumped tables
@@ -593,6 +622,17 @@ ALTER TABLE `bargains`
 ALTER TABLE `barter_items`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `barter_requests`
+--
+ALTER TABLE `barter_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_sender` (`sender_id`),
+  ADD KEY `fk_receiver` (`receiver_id`),
+  ADD KEY `fk_requested_item` (`requested_item_id`),
+  ADD KEY `fk_offered_item` (`offered_item_id`),
+  ADD KEY `fk_cancelled_by` (`cancelled_by`);
 
 --
 -- Indexes for table `cache`
@@ -739,7 +779,13 @@ ALTER TABLE `bargains`
 -- AUTO_INCREMENT for table `barter_items`
 --
 ALTER TABLE `barter_items`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `barter_requests`
+--
+ALTER TABLE `barter_requests`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `carts`
@@ -775,7 +821,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -823,7 +869,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_verifications`
 --
 ALTER TABLE `user_verifications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -841,6 +887,16 @@ ALTER TABLE `bargains`
 --
 ALTER TABLE `barter_items`
   ADD CONSTRAINT `barter_items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `barter_requests`
+--
+ALTER TABLE `barter_requests`
+  ADD CONSTRAINT `fk_cancelled_by` FOREIGN KEY (`cancelled_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_offered_item` FOREIGN KEY (`offered_item_id`) REFERENCES `barter_items` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_requested_item` FOREIGN KEY (`requested_item_id`) REFERENCES `barter_items` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_sender` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `carts`
